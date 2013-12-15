@@ -1,0 +1,33 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <p:dialog header="产品价格更新" widgetVar="productDialog" resizable="false" id="productDlg"
+              modal="true" style="font-size: 12px;">
+
+        <h:panelGrid id="display" columns="2" cellpadding="4">
+            <f:facet name="header">
+                <p:graphicImage
+                        value="/resources/upload/#{supportDataMaintainView.selectedProductInfo.pictureName}"/>
+            </f:facet>
+
+            <h:outputText value="产品代码:"/>
+            <h:outputText value="#{supportDataMaintainView.selectedProductInfo.productCode}"/>
+
+            <h:outputText value="产品类别:"/>
+            <h:outputText value="#{supportDataMaintainView.selectedProductInfo.categoryCode}"/>
+
+            <h:outputText value="产品价格:"/>
+            <h:inputText value="#{supportDataMaintainView.selectedProductInfo.price}"/>
+
+            <p:commandButton id="btn_edit" rendered="#{ supportDataMaintainView.action=='edit'}" value="更新"
+                             update=":tabView:form1" validateClient="true" ajax="true" process="productDlg"
+                             action="#{supportDataMaintainView.updateProductInfo}">
+                <f:setPropertyActionListener value="list" target="#{supportDataMaintainView.action}"/>
+            </p:commandButton>
+
+        </h:panelGrid>
+
+    </p:dialog>
+</ui:composition>

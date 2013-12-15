@@ -1,0 +1,133 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="siteTitle">库存管理系统-产品单位</ui:define>
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="menuCode" value="#{supportDataMaintainView.menuCode}"/>
+            <f:viewParam name="action" value="#{supportDataMaintainView.action}"/>
+            <f:viewAction action="#{supportDataMaintainView.loadData}" onPostback="false"></f:viewAction>
+        </f:metadata>
+    </ui:define>
+
+    <ui:define name="jsLib">
+        <script type="text/javascript">
+            function openEditSection(action) {
+                /*                if (action == 1) {
+                 $("#categoryName").val("");
+                 $("#categoryDesc").val("");
+                 $("#actionTitle").html("创建新目录");
+                 $("#catalogID").val(0);
+                 } else {
+                 $("#actionTitle").html("更新目录");
+                 }*/
+                if (action == 1) {
+                    $("#newAddUnitDiv").hide();
+                    $("#productUnitID").val(0);
+                }
+                $("#productUnitSection").show();
+            }
+
+        </script>
+    </ui:define>
+
+    <ui:define name="breadCrumbText">产品单位</ui:define>
+    <ui:define name="mainContentContainer">
+        <p:dataTable id="unitsTable" value="#{supportDataMaintainView.productUnitList}" var="unit"
+                     style="width: 80%; margin-left: 5px;">
+
+            <p:column  styleClass="table_header">
+                <f:facet name="header">
+                    <h:outputText value="单位名称"/>
+                </f:facet>
+                <h:outputText value="#{unit.unitName}"/>
+            </p:column>
+
+            <p:column  styleClass="table_header">
+                <f:facet name="header">
+                    <h:outputText value="单位说明"/>
+                </f:facet>
+                <h:outputText value="#{unit.description}"/>
+            </p:column>
+
+            <p:column  styleClass="table_header">
+                <f:facet name="header">
+                    <h:outputText value="操作选项"/>
+                </f:facet>
+
+                <p:commandLink style="margin-right:20px;" update=":form" ajax="true" process="@this"
+                               oncomplete="$('#productUnitSection').show(); $('#newAddUnitDiv').hide();">
+                    <h:outputText value="编辑"/>
+                    <f:setPropertyActionListener value="edit" target="#{supportDataMaintainView.action}"/>
+                    <f:setPropertyActionListener value="#{unit}" target="#{supportDataMaintainView.productUnit}"/>
+                </p:commandLink>
+
+                <p:commandLink id="delete" style="margin-right:20px;"
+                               action="#{supportDataMaintainView.deleteProductUnit}" process="@this" update=":form"
+                               immediate="true">
+                    <h:outputText value="删除"/>
+                    <f:setPropertyActionListener value="#{unit}" target="#{supportDataMaintainView.productUnit}"/>
+                    <f:setPropertyActionListener value="delete" target="#{supportDataMaintainView.action}"/>
+                </p:commandLink>
+
+            </p:column>
+        </p:dataTable>
+
+        <br/>
+
+        <div style="width: 80%; margin-left: 5px;" id="newAddUnitDiv">
+            <p:commandLink style="margin-right:20px;" update=":form" ajax="true" process="@this"
+                           oncomplete="$('#productUnitSection').show(); $('#newAddUnitDiv').hide();">
+                <h:outputText value="新增产品单位"/>
+                <f:setPropertyActionListener value="add" target="#{supportDataMaintainView.action}"/>
+            </p:commandLink>
+        </div>
+        <br/>
+
+        <div id="productUnitSection" style="width: 80%; margin-left: 5px;">
+            <p:messages autoUpdate="false"/>
+            <h:panelGrid columns="4" id="editSection"
+                         rendered="#{supportDataMaintainView.action=='edit' or supportDataMaintainView.action=='add'}">
+                <h:outputLabel value="单位名称 : *" for="unitName"></h:outputLabel>
+                <p:inputText id="unitName"
+                             value="#{supportDataMaintainView.productUnit.unitName}" required="true"
+                             requiredMessage="单位名称不可为空"/>
+                <p:message for="unitName"/>
+                <h:outputText value=""/>
+
+                <h:outputLabel value="单位说明 :" for="unitDesc"></h:outputLabel>
+                <p:inputText id="unitDesc" required="false"
+                             value="#{supportDataMaintainView.productUnit.description}"/>
+                <p:message for="unitDesc"/>
+                <h:outputText value=""/>
+            </h:panelGrid>
+            <!--<p:commandButton id="btn_add" rendered="#{ supportDataMaintainView.action=='add'}" value="新增"-->
+            <!--update=":form" validateClient="true" ajax="false"-->
+            <!--oncomplete="$('#productUnitSection').hide(); $('#newAddUnitDiv').show();"-->
+            <!--action="#{supportDataMaintainView.addNewProductUnit}">-->
+            <!--</p:commandButton>-->
+
+            <p:commandButton id="btn_save" rendered="#{ supportDataMaintainView.action=='add'}" value="新增"
+                             update=":form" validateClient="true" ajax="true"
+                             actionListener="#{supportDataMaintainView.saveProductUnit}">
+            </p:commandButton>
+
+            <p:commandButton id="btn_edit" rendered="#{ supportDataMaintainView.action=='edit'}" value="更新"
+                             update=":form" validateClient="true" ajax="true"
+                             action="#{supportDataMaintainView.addNewProductUnit}">
+                <f:setPropertyActionListener value="list" target="#{supportDataMaintainView.action}"/>
+            </p:commandButton> &#160;&#160;
+            <!--<p:commandButton value="取消" type="reset"-->
+            <!--rendered="#{supportDataMaintainView.action=='edit' or supportDataMaintainView.action=='add'}"/>-->
+            <!--&#160;&#160;-->
+            <p:commandButton value="关闭" ajax="true" update=":form" process="@this"
+                             rendered="#{supportDataMaintainView.action=='edit' or supportDataMaintainView.action=='add'}">
+                <f:setPropertyActionListener value="list" target="#{supportDataMaintainView.action}"/>
+            </p:commandButton>
+        </div>
+    </ui:define>
+</ui:composition>

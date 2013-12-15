@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+  <!-- Hibernate -->
+  <persistence-unit name="imsPersistenceUnit" transaction-type="RESOURCE_LOCAL">
+    <!-- <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider> -->
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <class>com.ims.domain.customer.CustomerInfo</class>
+    <class>com.ims.domain.customer.CustomerProductCodeMap</class>
+    <class>com.ims.domain.order.ProformaInvoiceItem</class>
+    <class>com.ims.domain.order.PurchaseOrder</class>
+    <class>com.ims.domain.order.PurchaseOrderItem</class>
+    <class>com.ims.domain.order.ShipmentProformaInvoice</class>
+    <class>com.ims.domain.stock.ProductStockInfo</class>
+    <class>com.ims.domain.support.ProductCategory</class>
+    <class>com.ims.domain.support.ProductInfo</class>
+    <class>com.ims.domain.support.ProductUnit</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+  </persistence-unit>
+</persistence>

@@ -1,0 +1,300 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                template="/WEB-INF/template/layout.xhtml">
+
+<ui:define name="siteTitle">库存管理系统-首页</ui:define>
+
+<ui:define name="jsLib">
+    <script language="JavaScript">
+        function setSemiProdStockAmount() {
+            if ($("#supportSize").val() == 'true') {
+                $("#size4Amount").val($("#size4Amount_readonly").html());
+                $("#size5Amount").val($("#size5Amount_readonly").html());
+                $("#size6Amount").val($("#size6Amount_readonly").html());
+                $("#size7Amount").val($("#size7Amount_readonly").html());
+                $("#size8Amount").val($("#size8Amount_readonly").html());
+                $("#size9Amount").val($("#size9Amount_readonly").html());
+                $("#size10Amount").val($("#size10Amount_readonly").html());
+            } else if($("#supportSize").val() == 'false') {
+            $("#newStockAmount").val($("#stockAmount_readonly").html());
+            }
+        }
+    </script>
+</ui:define>
+
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewParam name="menuCode" value="#{stockMaintainView.menuCode}"/>
+        <f:viewAction action="#{stockMaintainView.loadData}" onPostback="false"/>
+    </f:metadata>
+</ui:define>
+
+<ui:define name="breadCrumbText">半成品库存管理</ui:define>
+<ui:define name="mainContentContainer">
+<p:growl id="messages1" showDetail="false"/>
+<h:panelGrid id="searchProdStockCriteria" columns="15">
+    <h:outputLabel for="prodType" value="产品类型:"/>
+    <p:selectOneMenu id="prodType" value="#{stockMaintainView.stockSearchCriteria.prodCategoryCode}"
+                     style="width: 120px;">
+        <f:selectItem itemLabel="所有产品类型" itemValue=""/>
+        <f:selectItems value="#{stockMaintainView.prodCategoryList}" var="category"
+                       itemLabel="#{category.categoryName}" itemValue="#{category.categoryName}"/>
+        <p:ajax update="productSemiStockTable" listener="#{stockMaintainView.filterProductStockList}"
+                process="searchProdStockCriteria"/>
+    </p:selectOneMenu>
+
+    <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+    <h:outputLabel for="stockAmount" value="库存总量: "/>
+    <p:selectOneMenu id="compareCode" value="#{stockMaintainView.stockSearchCriteria.compareCode}"
+                     style="width: 120px;">
+        <f:selectItem itemLabel="选择比较符" itemValue=""/>
+        <f:selectItems value="#{stockMaintainView.stockSearchCriteria.compareCodeList}" var="compare"
+                       itemLabel="#{compare.displayName}" itemValue="#{compare.code}"/>
+        <p:ajax update="searchProdStockCriteria" listener="#{stockMaintainView.enableCompareValueInput}"
+                process="searchProdStockCriteria"/>
+    </p:selectOneMenu>
+    <p:inputText id="stockAmount" value="#{stockMaintainView.stockSearchCriteria.stockAmount}" style="width: 50px;"
+                 required="#{stockMaintainView.stockSearchCriteria.requireCompareValue}"
+                 rendered="#{stockMaintainView.stockSearchCriteria.requireCompareValue}" requiredMessage="请输入比较的数量"
+                 converterMessage="比较数量必须是数字">
+        <o:validator validatorId="javax.faces.LongRange" for="stockAmount"
+                     minimum="0" message="比较数量必须大于或等于0"/>
+        <!--<p:ajax update="stockAmount" event="blur" />-->
+        <p:clientValidator/>
+    </p:inputText>
+
+    <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+    <h:outputLabel for="prodCode" value="产品代号: "/>
+    <p:inputText id="prodCode" value="#{stockMaintainView.stockSearchCriteria.prodCode}" style="width: 120px;"/>
+
+    <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+    <p:commandButton id="btn_searchProdInfo" value="查找" process="searchProdStockCriteria"
+                     update=":form:messages1 productSemiStockTable"
+                     action="#{stockMaintainView.filterProductStockList}">
+    </p:commandButton>
+</h:panelGrid>
+
+<p:growl id="messages" showDetail="true"/>
+<p:outputPanel id="productSemiProdStockPanel" style="margin-left: 5px; width: 95%;">
+<p:dataTable id="productSemiStockTable" value="#{stockMaintainView.stockInfoDTOList}" var="product"
+             paginator="true" rows="10"
+             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+             editable="true">
+<p:ajax event="rowEdit" listener="#{stockMaintainView.editProdStock}" update=":form:messages"/>
+<p:ajax event="rowEditCancel" listener="#{stockMaintainView.onCancel}" update=":form:messages"/>
+<p:columnGroup type="header">
+    <p:row>
+        <p:column rowspan="2" headerText="产品代码" styleClass="table_header" style="width:10%"/>
+        <p:column rowspan="2" headerText="产品类别" styleClass="table_header" style="width:10%"/>
+        <p:column colspan="8" headerText="产品数量" styleClass="table_header"/>
+        <p:column rowspan="2" headerText="操作" styleClass="table_header"/>
+        <p:column rowspan="2" headerText="转换成品" styleClass="table_header"/>
+    </p:row>
+
+    <p:row>
+        <p:column headerText="#4" styleClass="table_header" style="width:8%"/>
+        <p:column headerText="#5" styleClass="table_header" style="width:8%"/>
+        <p:column headerText="#6" styleClass="table_header" style="width:8%"/>
+        <p:column headerText="#7" styleClass="table_header" style="width:8%"/>
+        <p:column headerText="#8" styleClass="table_header" style="width:8%"/>
+        <p:column headerText="#9" styleClass="table_header" style="width:8%"/>
+        <p:column headerText="#10" styleClass="table_header" style="width:8%"/>
+        <p:column headerText="总数" styleClass="table_header" style="width:8%"/>
+    </p:row>
+</p:columnGroup>
+
+<p:column>
+    #{product.targetProductStock.productCode}
+</p:column>
+
+<p:column>
+    #{product.targetProductStock.categoryCode}
+</p:column>
+
+<p:column>
+    <p:cellEditor>
+        <f:facet name="output">
+            <h:outputText value="#{product.targetProductStock.size4Amount}"
+                          rendered="#{product.targetProductStock.supportSize}"/>
+        </f:facet>
+        <f:facet name="input">
+            <p:inputText value="#{product.targetProductStock.size4Amount}"
+                         rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
+        </f:facet>
+    </p:cellEditor>
+</p:column>
+
+<p:column>
+    <p:cellEditor>
+        <f:facet name="output">
+            <h:outputText value="#{product.targetProductStock.size5Amount}"
+                          rendered="#{product.targetProductStock.supportSize}"/>
+        </f:facet>
+        <f:facet name="input">
+            <p:inputText value="#{product.targetProductStock.size5Amount}"
+                         rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
+        </f:facet>
+    </p:cellEditor>
+</p:column>
+
+<p:column>
+    <p:cellEditor>
+        <f:facet name="output">
+            <h:outputText value="#{product.targetProductStock.size6Amount}"
+                          rendered="#{product.targetProductStock.supportSize}"/>
+        </f:facet>
+        <f:facet name="input">
+            <p:inputText value="#{product.targetProductStock.size6Amount}"
+                         rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
+        </f:facet>
+    </p:cellEditor>
+</p:column>
+
+<p:column>
+    <p:cellEditor>
+        <f:facet name="output">
+            <h:outputText value="#{product.targetProductStock.size7Amount}"
+                          rendered="#{product.targetProductStock.supportSize}"/>
+        </f:facet>
+        <f:facet name="input">
+            <p:inputText value="#{product.targetProductStock.size7Amount}"
+                         rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
+        </f:facet>
+    </p:cellEditor>
+</p:column>
+
+<p:column>
+    <p:cellEditor>
+        <f:facet name="output">
+            <h:outputText value="#{product.targetProductStock.size8Amount}"
+                          rendered="#{product.targetProductStock.supportSize}"/>
+        </f:facet>
+        <f:facet name="input">
+            <p:inputText value="#{product.targetProductStock.size8Amount}"
+                         rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
+        </f:facet>
+    </p:cellEditor>
+</p:column>
+
+<p:column>
+    <p:cellEditor>
+        <f:facet name="output">
+            <h:outputText value="#{product.targetProductStock.size9Amount}"
+                          rendered="#{product.targetProductStock.supportSize}"/>
+        </f:facet>
+        <f:facet name="input">
+            <p:inputText value="#{product.targetProductStock.size9Amount}"
+                         rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
+        </f:facet>
+    </p:cellEditor>
+</p:column>
+
+<p:column>
+    <p:cellEditor>
+        <f:facet name="output">
+            <h:outputText value="#{product.targetProductStock.size10Amount}"
+                          rendered="#{product.targetProductStock.supportSize}"/>
+        </f:facet>
+        <f:facet name="input">
+            <p:inputText value="#{product.targetProductStock.size10Amount}"
+                         rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
+        </f:facet>
+    </p:cellEditor>
+</p:column>
+
+<p:column>
+    <p:cellEditor>
+        <f:facet name="output">
+            <h:outputText value="#{product.targetProductStock.stockAmount}"/>
+        </f:facet>
+        <f:facet name="input">
+            <p:inputText value="#{product.targetProductStock.stockAmount}"
+                         rendered="#{!product.targetProductStock.supportSize}" style="width:100%"/>
+        </f:facet>
+    </p:cellEditor>
+</p:column>
+
+<p:column style="width:6%">
+    <p:rowEditor/>
+</p:column>
+<p:column>
+    <p:commandLink style="margin-right:20px;" update=":form" ajax="true" process="@this"
+                   oncomplete="PF('semiProdDialog').show()" rendered="#{product.targetProductStock.stockAmount>0}">
+        <h:outputText value="转换"/>
+        <f:setPropertyActionListener value="convertStock" target="#{stockMaintainView.action}"/>
+        <f:setPropertyActionListener value="#{product.targetProductStock}"
+                                     target="#{stockMaintainView.selectedProductStock}"/>
+    </p:commandLink>
+</p:column>
+<!--<p:column styleClass="table_header">-->
+<!--<p:commandLink style="margin-right:20px;">-->
+<!--<h:outputText value="编辑"/>-->
+<!--<f:setPropertyActionListener value="edit" target="#{supportDataMaintainView.action}"/>-->
+<!--<f:setPropertyActionListener value="#{product}"-->
+<!--target="#{supportDataMaintainView.selectedProductInfo}"/>-->
+<!--</p:commandLink>-->
+
+<!--</p:column>-->
+
+<!--<p:column styleClass="table_header">-->
+<!--<f:facet name="header">-->
+<!--<h:outputText value="产品代码"/>-->
+<!--</f:facet>-->
+<!--<h:outputText value="#{product.productCode}"/>-->
+<!--</p:column>-->
+
+<!--<p:column styleClass="table_header">-->
+<!--<f:facet name="header">-->
+<!--<h:outputText value="产品类别"/>-->
+<!--</f:facet>-->
+<!--<h:outputText value="#{product.categoryCode}"/>-->
+<!--</p:column>-->
+
+<!--<p:column styleClass="table_header">-->
+<!--<f:facet name="header">-->
+<!--<h:outputText value="产品价格"/>-->
+<!--</f:facet>-->
+<!--<h:outputText value="#{product.size4}"/>-->
+<!--</p:column>-->
+
+<!--<p:column styleClass="table_header">-->
+<!--<f:facet name="header">-->
+<!--<h:outputText value="产品图片"/>-->
+<!--</f:facet>-->
+<!--<p:graphicImage-->
+<!--value="/resources/upload/#{product.productPicture}"/>-->
+<!--</p:column>-->
+
+<!--<p:column styleClass="table_header">-->
+<!--<f:facet name="header">-->
+<!--<h:outputText value="操作"/>-->
+<!--</f:facet>-->
+<!--<p:commandLink style="margin-right:20px;" update="@this" ajax="true" process="@this"-->
+<!--oncomplete="PF('productDialog').show()">-->
+<!--<h:outputText value="编辑"/>-->
+<!--<f:setPropertyActionListener value="edit" target="#{supportDataMaintainView.action}"/>-->
+<!--<f:setPropertyActionListener value="#{product}"-->
+<!--target="#{supportDataMaintainView.selectedProductInfo}"/>-->
+<!--</p:commandLink>-->
+
+<!--<p:commandLink id="delete" style="margin-right:20px;"-->
+<!--action="#{supportDataMaintainView.deleteProductInfo}" process="@this"-->
+<!--update="@this"-->
+<!--immediate="true">-->
+<!--<h:outputText value="删除"/>-->
+<!--<f:setPropertyActionListener value="#{product}"-->
+<!--target="#{supportDataMaintainView.selectedProductInfo}"/>-->
+<!--<f:setPropertyActionListener value="delete" target="#{supportDataMaintainView.action}"/>-->
+<!--</p:commandLink>-->
+<!--</p:column>-->
+
+</p:dataTable>
+
+</p:outputPanel>
+<ui:include src="widget/prod_stock_edit.xhtml"></ui:include>
+</ui:define>
+</ui:composition>

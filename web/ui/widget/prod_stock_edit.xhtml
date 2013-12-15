@@ -1,0 +1,130 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+
+    <p:dialog header="半成品-->成品转换" widgetVar="semiProdDialog" resizable="false" id="productStockDialog"
+              modal="true" style="font-size: 12px;">
+        <p:growl id="stockConvertMsg" showDetail="false"/>
+        <h:panelGrid id="general" columns="2" cellpadding="4">
+            <h:outputText value="产品代码:"/>
+            <h:outputText value="#{stockMaintainView.selectedProductStock.productCode}"/>
+
+            <h:outputText value="产品类别:"/>
+            <h:outputText value="#{stockMaintainView.selectedProductStock.categoryCode}"/>
+        </h:panelGrid>
+
+        <h:panelGrid id="stockAmount1" columns="2" cellpadding="4"
+                     rendered="#{!stockMaintainView.selectedProductStock.supportSize}">
+            <h:outputText value="库存总量:"/>
+            <h:outputText id="stockAmount_readonly" value="#{stockMaintainView.selectedProductStock.stockAmount}"/>
+
+            <h:outputText value="转换成品数量:"/>
+            <h:inputText id="newStockAmount" value="#{stockMaintainView.newStockAmount.stockAmount}"
+                         requiredMessage="请输入转换的数量" converterMessage="库存量必须是数字">
+                <o:validator validatorId="javax.faces.LongRange"
+                             minimum="0"
+                             maximum="#{stockMaintainView.newStockAmount.stockAmount}"
+                             message="请输入合法范围的转换库存量: 0 ~ #{stockMaintainView.newStockAmount.stockAmount}"/>
+                <p:clientValidator/>
+            </h:inputText>
+        </h:panelGrid>
+
+        <p:panelGrid id="stockAmount2" rendered="#{stockMaintainView.selectedProductStock.supportSize}">
+            <f:facet name="header">
+                <p:row>
+                    <p:column>#4</p:column>
+                    <p:column>#5</p:column>
+                    <p:column>#6</p:column>
+                    <p:column>#7</p:column>
+                    <p:column>#8</p:column>
+                    <p:column>#9</p:column>
+                    <p:column>#10</p:column>
+                </p:row>
+            </f:facet>
+            <p:row>
+                <p:column><h:outputText id="size4Amount_readonly"
+                                        value="#{stockMaintainView.selectedProductStock.size4Amount}"/></p:column>
+                <p:column><h:outputText id="size5Amount_readonly"
+                                        value="#{stockMaintainView.selectedProductStock.size5Amount}"/></p:column>
+                <p:column><h:outputText id="size6Amount_readonly"
+                                        value="#{stockMaintainView.selectedProductStock.size6Amount}"/></p:column>
+                <p:column><h:outputText id="size7Amount_readonly"
+                                        value="#{stockMaintainView.selectedProductStock.size7Amount}"/></p:column>
+                <p:column><h:outputText id="size8Amount_readonly"
+                                        value="#{stockMaintainView.selectedProductStock.size8Amount}"/></p:column>
+                <p:column><h:outputText id="size9Amount_readonly"
+                                        value="#{stockMaintainView.selectedProductStock.size9Amount}"/></p:column>
+                <p:column><h:outputText id="size10Amount_readonly"
+                                        value="#{stockMaintainView.selectedProductStock.size10Amount}"/></p:column>
+            </p:row>
+
+            <p:row>
+                <p:column><h:inputText id="size4Amount" style="width: 40px;"
+                                       value="#{stockMaintainView.newStockAmount.size4Amount}">
+                    <o:validator validatorId="javax.faces.LongRange"
+                                 minimum="0"
+                                 maximum="#{stockMaintainView.selectedProductStock.size4Amount}"
+                                 message="#4 请输入合法范围的数据: 0 ~ #{stockMaintainView.selectedProductStock.size4Amount}"/>
+                    <p:clientValidator/>
+                </h:inputText></p:column>
+                <p:column><h:inputText id="size5Amount" style="width: 40px;"
+                                       value="#{stockMaintainView.newStockAmount.size5Amount}">
+                    <o:validator validatorId="javax.faces.LongRange"
+                                 minimum="0"
+                                 maximum="#{stockMaintainView.selectedProductStock.size5Amount}"
+                                 message="#5 请输入合法范围的数据: 0 ~ #{stockMaintainView.selectedProductStock.size5Amount}"/>
+                    <p:clientValidator/>
+                </h:inputText></p:column>
+                <p:column><h:inputText id="size6Amount" style="width: 40px;"
+                                       value="#{stockMaintainView.newStockAmount.size6Amount}">
+                    <o:validator validatorId="javax.faces.LongRange"
+                                 minimum="0"
+                                 maximum="#{stockMaintainView.selectedProductStock.size6Amount}"
+                                 message="#6 请输入合法范围的数据: 0 ~ #{stockMaintainView.selectedProductStock.size6Amount}"/>
+                    <p:clientValidator/>
+                </h:inputText>
+                </p:column>
+                <p:column><h:inputText id="size7Amount" style="width: 40px;"
+                                       value="#{stockMaintainView.newStockAmount.size7Amount}">
+                    <o:validator validatorId="javax.faces.LongRange"
+                                 minimum="0"
+                                 maximum="#{stockMaintainView.selectedProductStock.size7Amount}"
+                                 message="#7 请输入合法范围的数据: 0 ~ #{stockMaintainView.selectedProductStock.size7Amount}"/>
+                    <p:clientValidator/>
+                </h:inputText></p:column>
+                <p:column><h:inputText id="size8Amount" style="width: 40px;"
+                                       value="#{stockMaintainView.newStockAmount.size8Amount}">
+                    <o:validator validatorId="javax.faces.LongRange"
+                                 minimum="0"
+                                 maximum="#{stockMaintainView.selectedProductStock.size8Amount}"
+                                 message="#8 请输入合法范围的数据: 0 ~ #{stockMaintainView.selectedProductStock.size8Amount}"/>
+                    <p:clientValidator/>
+                </h:inputText></p:column>
+                <p:column><h:inputText id="size9Amount" style="width: 40px;"
+                                       value="#{stockMaintainView.newStockAmount.size9Amount}">
+                    <o:validator validatorId="javax.faces.LongRange"
+                                 minimum="0"
+                                 maximum="#{stockMaintainView.selectedProductStock.size9Amount}"
+                                 message="#9 请输入合法范围的数据: 0 ~ #{stockMaintainView.selectedProductStock.size9Amount}"/>
+                    <p:clientValidator/>
+                </h:inputText></p:column>
+                <p:column><h:inputText id="size10Amount" style="width: 40px;"
+                                       value="#{stockMaintainView.newStockAmount.size10Amount}">
+                    <o:validator validatorId="javax.faces.LongRange"
+                                 minimum="0"
+                                 maximum="#{stockMaintainView.selectedProductStock.size10Amount}"
+                                 message="#10 请输入合法范围的数据: 0 ~ #{stockMaintainView.selectedProductStock.size10Amount}"/>
+                    <p:clientValidator/>
+                </h:inputText></p:column>
+            </p:row>
+        </p:panelGrid>
+        <p:commandButton id="btn_edit" update=":form:stockConvertMsg" value="保存" validateClient="true" ajax="true"
+                         process="productStockDialog"
+                         action="#{stockMaintainView.convertToFinishedProd}" oncomplete="if (args &amp;&amp; !args.validationFailed) semiProdDialog.hide()" >
+        </p:commandButton>
+    </p:dialog>
+</ui:composition>

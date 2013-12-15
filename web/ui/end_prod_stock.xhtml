@@ -1,0 +1,318 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:of="http://omnifaces.org/functions"
+                template="/WEB-INF/template/layout.xhtml">
+
+<ui:define name="siteTitle">库存管理系统-首页</ui:define>
+
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewParam name="menuCode" value="#{stockMaintainView.menuCode}"/>
+        <f:viewAction action="#{stockMaintainView.loadData}" onPostback="false"/>
+    </f:metadata>
+</ui:define>
+
+<ui:define name="jsLib">
+<script language="JavaScript">
+    function changeCompareCode(){
+        alert("value");
+    }
+</script>
+</ui:define>
+
+<ui:define name="breadCrumbText">成品库存管理</ui:define>
+<ui:define name="mainContentContainer">
+    <p:growl id="messages1" showDetail="false"/>
+    <p:outputPanel id="productSemiProdStockPanel" style="margin-left: 5px; width: 98%;">
+    <h:panelGrid id="searchProdStockCriteria" columns="15">
+        <h:outputLabel for="prodType" value="产品类型:"/>
+        <p:selectOneMenu id="prodType" value="#{stockMaintainView.stockSearchCriteria.prodCategoryCode}"  style="width: 120px;">
+            <f:selectItem itemLabel="所有产品类型" itemValue=""/>
+            <f:selectItems value="#{stockMaintainView.prodCategoryList}" var="category"
+                           itemLabel="#{category.categoryName}" itemValue="#{category.categoryName}"/>
+            <p:ajax update="productStockTable" listener="#{stockMaintainView.filterProductStockList}"  process="searchProdStockCriteria"/>
+        </p:selectOneMenu>
+
+        <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+        <h:outputLabel for="stockAmount" value="库存总量: "/>
+        <p:selectOneMenu id="compareCode" value="#{stockMaintainView.stockSearchCriteria.compareCode}"  style="width: 120px;" >
+            <f:selectItem itemLabel="选择比较符" itemValue=""/>
+            <f:selectItems value="#{stockMaintainView.stockSearchCriteria.compareCodeList}" var="compare"
+                           itemLabel="#{compare.displayName}" itemValue="#{compare.code}"/>
+            <p:ajax update="searchProdStockCriteria" listener="#{stockMaintainView.enableCompareValueInput}"  process="searchProdStockCriteria"/>
+        </p:selectOneMenu>
+        <p:inputText id="stockAmount" value="#{stockMaintainView.stockSearchCriteria.stockAmount}" style="width: 50px;" required="#{stockMaintainView.stockSearchCriteria.requireCompareValue}" rendered="#{stockMaintainView.stockSearchCriteria.requireCompareValue}" requiredMessage="请输入比较的数量" converterMessage="比较数量必须是数字" >
+            <o:validator validatorId="javax.faces.LongRange" for="stockAmount"
+                         minimum="0" message="比较数量必须大于或等于0"/>
+            <!--<p:ajax update="stockAmount" event="blur" />-->
+            <p:clientValidator />
+        </p:inputText>
+
+        <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+        <h:outputLabel for="prodCode" value="产品代号: "/>
+        <p:inputText id="prodCode" value="#{stockMaintainView.stockSearchCriteria.prodCode}" style="width: 120px;"/>
+
+        <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+        <p:commandButton id="btn_searchProdInfo" value="查找" process="searchProdStockCriteria" update=":form:messages1 productStockTable" action="#{stockMaintainView.filterProductStockList}">
+        </p:commandButton>
+    </h:panelGrid>
+
+        <p:dataTable id="productStockTable" value="#{stockMaintainView.stockInfoDTOList}" var="product"
+                     paginator="true" rows="10"
+                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} " editable="true">
+            <p:ajax event="rowEdit" listener="#{stockMaintainView.editProdStock}" update=":form:messages1"/>
+            <p:ajax event="rowEditCancel" listener="#{stockMaintainView.onCancel}" update=":form:messages1" />
+            <p:columnGroup type="header">
+                <p:row>
+                    <p:column rowspan="2" headerText="产品代码" styleClass="table_header" style="width:8%"/>
+                    <p:column rowspan="2" headerText="产品类别" styleClass="table_header"  style="width:8%"/>
+                    <p:column colspan="8" headerText="产品数量" styleClass="table_header"/>
+                    <p:column rowspan="2" headerText="操作" styleClass="table_header"/>
+                </p:row>
+
+                <p:row>
+                    <p:column headerText="#4" styleClass="table_header" style="width:9%"/>
+                    <p:column headerText="#5" styleClass="table_header" style="width:9%"/>
+                    <p:column headerText="#6" styleClass="table_header" style="width:9%"/>
+                    <p:column headerText="#7" styleClass="table_header" style="width:9%"/>
+                    <p:column headerText="#8" styleClass="table_header" style="width:9%"/>
+                    <p:column headerText="#9" styleClass="table_header" style="width:9%"/>
+                    <p:column headerText="#10" styleClass="table_header" style="width:9%"/>
+                    <p:column headerText="总数" styleClass="table_header" style="width:9%; font-weight: bold;"/>
+                </p:row>
+            </p:columnGroup>
+
+            <p:column>
+                #{product.targetProductStock.productCode}
+            </p:column>
+
+            <p:column>
+                #{product.targetProductStock.categoryCode}
+            </p:column>
+
+            <p:column>
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.targetProductStock.size4Amount}" rendered="#{product.targetProductStock.supportSize}" />
+                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size4Amount})" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <h:outputText value="#{product.targetProductStock.size4Amount}" rendered="#{product.targetProductStock.supportSize}" /><br/>
+                        <p:inputText value="#{product.newStockAmount.size4Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.size4Amount>0}" style="width:80%;">
+                            <o:validator validatorId="javax.faces.LongRange"
+                                         minimum="0"
+                                         maximum="#{product.relatedProductStock.size4Amount}" message="#4 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.size4Amount}" />
+                            <p:clientValidator />
+                        </p:inputText>
+                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size4Amount})" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column>
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.targetProductStock.size5Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size5Amount})" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <h:outputText value="#{product.targetProductStock.size5Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size5Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.size5Amount>0}" style="width:80%">
+                            <o:validator validatorId="javax.faces.LongRange"
+                                         minimum="0"
+                                         maximum="#{product.relatedProductStock.size5Amount}" message="#5 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.size5Amount}" />
+                            <p:clientValidator />
+                        </p:inputText>
+                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size5Amount})" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column>
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.targetProductStock.size6Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size6Amount})" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <h:outputText value="#{product.targetProductStock.size6Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size6Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.size6Amount>0}" style="width:80%">
+                            <o:validator validatorId="javax.faces.LongRange"
+                                         minimum="0"
+                                         maximum="#{product.relatedProductStock.size6Amount}" message="#6 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.size6Amount}" />
+                            <p:clientValidator />
+                        </p:inputText>
+                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size6Amount})" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column>
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.targetProductStock.size7Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size7Amount})" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <h:outputText value="#{product.targetProductStock.size7Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size7Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.size7Amount>0}" style="width:80%">
+                            <o:validator validatorId="javax.faces.LongRange"
+                                         minimum="0"
+                                         maximum="#{product.relatedProductStock.size7Amount}" message="#7 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.size7Amount}" />
+                            <p:clientValidator />
+                        </p:inputText>
+                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size7Amount})" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column>
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.targetProductStock.size8Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size8Amount})" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <h:outputText value="#{product.targetProductStock.size8Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size8Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.size8Amount>0}" style="width:80%">
+                            <o:validator validatorId="javax.faces.LongRange"
+                                         minimum="0"
+                                         maximum="#{product.relatedProductStock.size8Amount}" message="#8 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.size8Amount}" />
+                            <p:clientValidator />
+                        </p:inputText>
+                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size8Amount})" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column>
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.targetProductStock.size9Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size9Amount})" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <h:outputText value="#{product.targetProductStock.size9Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size9Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.size9Amount>0}" style="width:80%">
+                            <o:validator validatorId="javax.faces.LongRange"
+                                         minimum="0"
+                                         maximum="#{product.relatedProductStock.size9Amount}" message="#9 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.size9Amount}" />
+                            <p:clientValidator />
+                        </p:inputText>
+                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size9Amount})" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column>
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.targetProductStock.size10Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size10Amount})" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <h:outputText value="#{product.targetProductStock.size10Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size10Amount}"  rendered="#{product.targetProductStock.supportSize  and product.relatedProductStock.size10Amount>0}" style="width:80%">
+                            <o:validator validatorId="javax.faces.LongRange"
+                                         minimum="0"
+                                         maximum="#{product.relatedProductStock.size10Amount}" message="#10 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.size10Amount}" />
+                            <p:clientValidator />
+                        </p:inputText>
+                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.size10Amount})" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column>
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.targetProductStock.stockAmount}" />&#160;<h:outputText style="color: red;" value="(#{product.relatedProductStock.stockAmount})" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <h:outputText value="#{product.targetProductStock.stockAmount}" /><br/>
+                        <p:inputText value="#{product.newStockAmount.stockAmount}"  rendered="#{!product.targetProductStock.supportSize and product.relatedProductStock.stockAmount>0}" style="width:80%">
+                            <o:validator validatorId="javax.faces.LongRange"
+                                         minimum="0"
+                                         maximum="#{product.relatedProductStock.stockAmount}" message="请输入合法范围的数据: 0 ~ #{product.relatedProductStock.stockAmount}" />
+                            <p:clientValidator />
+                        </p:inputText><br/>
+                        <h:outputText style="color: red;" value="(#{product.relatedProductStock.stockAmount})" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column style="width:6%">
+                <!--<p:rowEditor/>-->
+                <p:rowEditor rendered="#{product.relatedProductStock.stockAmount>0 or product.relatedProductStock.size4Amount>0 or product.relatedProductStock.size5Amount>0 or product.relatedProductStock.size6Amount>0 or product.relatedProductStock.size7Amount>0 or product.relatedProductStock.size8Amount>0 or product.relatedProductStock.size9Amount>0 or product.relatedProductStock.size10Amount>0}"/>
+            </p:column>
+
+            <!--<p:column styleClass="table_header">-->
+            <!--<p:commandLink style="margin-right:20px;">-->
+            <!--<h:outputText value="编辑"/>-->
+            <!--<f:setPropertyActionListener value="edit" target="#{supportDataMaintainView.action}"/>-->
+            <!--<f:setPropertyActionListener value="#{product}"-->
+            <!--target="#{supportDataMaintainView.selectedProductInfo}"/>-->
+            <!--</p:commandLink>-->
+
+            <!--</p:column>-->
+
+            <!--<p:column styleClass="table_header">-->
+            <!--<f:facet name="header">-->
+            <!--<h:outputText value="产品代码"/>-->
+            <!--</f:facet>-->
+            <!--<h:outputText value="#{product.productCode}"/>-->
+            <!--</p:column>-->
+
+            <!--<p:column styleClass="table_header">-->
+            <!--<f:facet name="header">-->
+            <!--<h:outputText value="产品类别"/>-->
+            <!--</f:facet>-->
+            <!--<h:outputText value="#{product.categoryCode}"/>-->
+            <!--</p:column>-->
+
+            <!--<p:column styleClass="table_header">-->
+            <!--<f:facet name="header">-->
+            <!--<h:outputText value="产品价格"/>-->
+            <!--</f:facet>-->
+            <!--<h:outputText value="#{product.size4}"/>-->
+            <!--</p:column>-->
+
+            <!--<p:column styleClass="table_header">-->
+            <!--<f:facet name="header">-->
+            <!--<h:outputText value="产品图片"/>-->
+            <!--</f:facet>-->
+            <!--<p:graphicImage-->
+            <!--value="/resources/upload/#{product.productPicture}"/>-->
+            <!--</p:column>-->
+
+            <!--<p:column styleClass="table_header">-->
+            <!--<f:facet name="header">-->
+            <!--<h:outputText value="操作"/>-->
+            <!--</f:facet>-->
+            <!--<p:commandLink style="margin-right:20px;" update="@this" ajax="true" process="@this"-->
+            <!--oncomplete="PF('productDialog').show()">-->
+            <!--<h:outputText value="编辑"/>-->
+            <!--<f:setPropertyActionListener value="edit" target="#{supportDataMaintainView.action}"/>-->
+            <!--<f:setPropertyActionListener value="#{product}"-->
+            <!--target="#{supportDataMaintainView.selectedProductInfo}"/>-->
+            <!--</p:commandLink>-->
+
+            <!--<p:commandLink id="delete" style="margin-right:20px;"-->
+            <!--action="#{supportDataMaintainView.deleteProductInfo}" process="@this"-->
+            <!--update="@this"-->
+            <!--immediate="true">-->
+            <!--<h:outputText value="删除"/>-->
+            <!--<f:setPropertyActionListener value="#{product}"-->
+            <!--target="#{supportDataMaintainView.selectedProductInfo}"/>-->
+            <!--<f:setPropertyActionListener value="delete" target="#{supportDataMaintainView.action}"/>-->
+            <!--</p:commandLink>-->
+            <!--</p:column>-->
+
+        </p:dataTable>
+    </p:outputPanel>
+</ui:define>
+</ui:composition>

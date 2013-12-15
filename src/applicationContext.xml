@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+                http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="autoCommitOnClose" value="true"/>
+        <property name="checkoutTimeout" value="${cpool.checkoutTimeout}"/>
+        <property name="initialPoolSize" value="${cpool.minPoolSize}"/>
+        <property name="minPoolSize" value="${cpool.minPoolSize}"/>
+        <property name="maxPoolSize" value="${cpool.maxPoolSize}"/>
+        <property name="maxIdleTime" value="${cpool.maxIdleTime}"/>
+        <property name="acquireIncrement" value="${cpool.acquireIncrement}"/>
+        <property name="maxIdleTimeExcessConnections" value="${cpool.maxIdleTimeExcessConnections}"/>
+    </bean>
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <context:annotation-config/>
+    <context:component-scan base-package="com.ims"/>
+
+    <jpa:repositories base-package="com.ims.repository" entity-manager-factory-ref="entityManagerFactory"
+                      transaction-manager-ref="transactionManager"/>
+
+    <cache:annotation-driven/>
+    <!-- generic cache manager -->
+    <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+        <property name="caches">
+            <set>
+                <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="default"/>
+                <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
+                      p:name="serviceCategoryCache"/>
+            </set>
+        </property>
+    </bean>
+    <!-- 
+   <context:component-scan base-package="com.rms" use-default-filters="false">
+           <context:include-filter type="regex" expression=".service.*" />
+           <context:include-filter type="regex" expression=".repository.*" />
+           <context:exclude-filter type="regex" expression=".view.*" />
+           <context:exclude-filter type="regex" expression=".persistence.*" />
+   </context:component-scan>
+    -->
+
+
+    <!-- transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- 这个和上面那个有啥区别 -->
+    <!-- 
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+            <tx:attributes>
+                    <tx:method name="save*" propagation="REQUIRED" />
+                    <tx:method name="add*" propagation="REQUIRED" />
+                    <tx:method name="create*" propagation="REQUIRED" />
+                    <tx:method name="insert*" propagation="REQUIRED" />
+                    <tx:method name="update*" propagation="REQUIRED" />
+                    <tx:method name="merge*" propagation="REQUIRED" />
+                    <tx:method name="del*" propagation="REQUIRED" />
+                    <tx:method name="remove*" propagation="REQUIRED" />
+                    <tx:method name="put*" propagation="REQUIRED" />
+                    <tx:method name="use*" propagation="REQUIRED" />
+                    <tx:method name="get*" propagation="REQUIRED" read-only="true" />
+                    <tx:method name="count*" propagation="REQUIRED" read-only="true" />
+                    <tx:method name="find*" propagation="REQUIRED" read-only="true" />
+                    <tx:method name="list*" propagation="REQUIRED" read-only="true" />
+                    <tx:method name="*" read-only="true" />
+            </tx:attributes>
+    </tx:advice>
+    <aop:config expose-proxy="true"> -->
+    <!-- 
+            <aop:pointcut id="txPointcut" expression="execution(* com.rms.service..*.*(..))" />
+            <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut" />
+    </aop:config>  -->
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="persistenceXmlLocation" value="classpath:META-INF/persistence.xml"/>
+        <property name="persistenceUnitName" value="imsPersistenceUnit"/>
+        <property name="persistenceProvider" ref="persistenceProvider"/>
+        <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+        <property name="jpaDialect" ref="jpaDialect"/>
+        <!-- 配置要扫描的实体类 -->
+        <property name="packagesToScan">
+            <list>
+                <value>com.ims.domain.*</value>
+            </list>
+        </property>
+        <property name="jpaProperties" ref="hibernateJPAProperties">
+        </property>
+    </bean>
+
+    <!--Hibernate  ///////////////////////////////// -->
+    <bean id="persistenceProvider" class="org.hibernate.ejb.HibernatePersistence"/>
+    <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="generateDdl" value="false"/>
+        <property name="database" value="MYSQL"/>
+        <property name="showSql" value="true"/>
+        <property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect"/>
+    </bean>
+    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+    <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+    <util:properties id="hibernateJPAProperties">
+        <prop key="hibernate.show_sql">true</prop>
+        <prop key="hibernate.use_sql_comments">true</prop>
+        <!--        <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.provider_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>-->
+    </util:properties>
+
+
+    <!-- 采用了注解，所以下面是不需要的 -->
+    <!-- <bean id="baseDao" abstract="true" class="com.neview.server.dao.impl.jdbc.BaseDao"> 
+    <property name="dataSource" ref="dataSource"></property> </bean> <bean id="supportDataDao" 
+    parent="baseDao" class="com.neview.server.dao.impl.jdbc.SupportDataDaoImpl"></bean> 
+    <bean id="deviceDao" parent="baseDao" class="com.neview.server.dao.impl.jdbc.DeviceDaoImpl"></bean> -->
+
+
+    <!--        <bean id="entityManagerFactoryEclipseLink" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+            <property name="dataSource" ref="dataSource" />
+            <property name="loadTimeWeaver">
+                <bean class="org.springframework.instrument.classloading.SimpleLoadTimeWeaver"/>
+            </property>
+            <property name="persistenceXmlLocation" value="classpath:META-INF/persistence.xml" />
+            <property name="persistenceUnitName" value="imsPersistenceUnitEclipseLink" />
+            <property name="persistenceProvider" ref="persistenceProviderEclipseLink" />
+            <property name="jpaVendorAdapter" ref="jpaVendorAdapterEclipseLink" />
+            <property name="jpaDialect" ref="jpaDialectEclipseLink" />
+            <property name="packagesToScan">
+                <list>
+                    <value>classpath*:com.ims.domain.*</value>
+                </list>
+            </property>
+            <property name="jpaProperties">
+                <props>
+                    <prop key="eclipselink.logging.level">ALL</prop>
+                    <prop key="eclipselink.weaving">true</prop>
+                    <prop key="eclipselink.weaving.eager">true</prop>
+                </props>
+            </property>
+        </bean>
+        <bean id="persistenceProviderEclipseLink" class="org.eclipse.persistence.jpa.PersistenceProvider" />
+        <bean id="jpaVendorAdapterEclipseLink" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
+            <property name="generateDdl" value="false" />
+            <property name="database" value="MYSQL" />
+            <property name="showSql" value="true" />
+            <property name="databasePlatform" value="org.eclipse.persistence.platform.database.MySQLPlatform" />
+        </bean>
+        <bean id="jpaDialectEclipseLink" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaDialect" />-->
+</beans>
