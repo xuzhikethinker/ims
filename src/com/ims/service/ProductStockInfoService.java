@@ -42,7 +42,7 @@ public class ProductStockInfoService {
             updateStockAmount(targetStock, stockInfoDTO.getNewStockAmount(), true);
             updateStockAmount(relatedStock, stockInfoDTO.getNewStockAmount(), false);
             this.saveProductStockInfo(relatedStock);
-        }else{
+        } else {
             updateStockAmount(targetStock, stockInfoDTO.getNewStockAmount(), true);
         }
         this.saveProductStockInfo(targetStock);
@@ -58,8 +58,8 @@ public class ProductStockInfoService {
         stockInfo.setSize5Amount(addStock ? stockInfo.getSize5Amount() + newStockAmount.getSize5Amount() : stockInfo.getSize5Amount() - newStockAmount.getSize5Amount());
         stockInfo.setSize4Amount(addStock ? stockInfo.getSize4Amount() + newStockAmount.getSize4Amount() : stockInfo.getSize4Amount() - newStockAmount.getSize4Amount());
 
-        if(stockInfo.isSupportSize()){
-            int stockAmount = stockInfo.getSize4Amount()+stockInfo.getSize5Amount()+stockInfo.getSize6Amount()+stockInfo.getSize7Amount()+stockInfo.getSize8Amount()+stockInfo.getSize9Amount()+stockInfo.getSize10Amount();
+        if (stockInfo.isSupportSize()) {
+            int stockAmount = stockInfo.getSize4Amount() + stockInfo.getSize5Amount() + stockInfo.getSize6Amount() + stockInfo.getSize7Amount() + stockInfo.getSize8Amount() + stockInfo.getSize9Amount() + stockInfo.getSize10Amount();
             stockInfo.setStockAmount(stockAmount);
         }
     }
@@ -74,20 +74,24 @@ public class ProductStockInfoService {
                     predicates.add(cb.equal(root.get("categoryCode"), stockSearchCriteria.getProdCategoryCode()));
                 }
                 if (StringUtils.isNotEmpty(stockSearchCriteria.getProdCode())) {
-                    predicates.add(cb.like(root.<String>get("productCode"), "%"+stockSearchCriteria.getProdCode()+"%"));
+                    predicates.add(cb.like(root.<String>get("productCode"), "%" + stockSearchCriteria.getProdCode() + "%"));
                 }
                 String compareCode = stockSearchCriteria.getCompareCode();
-                if(StringUtils.isNotEmpty(compareCode) && stockSearchCriteria.isIncludeComparedValue()){
-                    if(CompareCode.isEqual(compareCode)){
-                    predicates.add(cb.equal(root.get("stockAmount"),stockSearchCriteria.getStockAmount()));
-                    }else if(CompareCode.isGreater(compareCode)){
-                        predicates.add(cb.greaterThan(root.<Integer>get("stockAmount"),stockSearchCriteria.getStockAmount()));
-                    }else if(CompareCode.isLess(compareCode)){
-                        predicates.add(cb.lessThan(root.<Integer>get("stockAmount"),stockSearchCriteria.getStockAmount()));
-                    }else if(CompareCode.isGreaterOrEqual(compareCode)){
-                        predicates.add(cb.greaterThanOrEqualTo(root.<Integer>get("stockAmount"),stockSearchCriteria.getStockAmount()));
-                    }else if(CompareCode.isLessOrEqual(compareCode)){
-                        predicates.add(cb.lessThanOrEqualTo(root.<Integer>get("stockAmount"),stockSearchCriteria.getStockAmount()));
+                if (StringUtils.isNotEmpty(compareCode) && stockSearchCriteria.isIncludeComparedValue()) {
+                    if (CompareCode.isEqual(compareCode)) {
+                        predicates.add(cb.equal(root.get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                    } else if (CompareCode.isGreater(compareCode)) {
+                        predicates.add(cb.greaterThan(root.<Integer>get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                    } else if (CompareCode.isLess(compareCode)) {
+                        predicates.add(cb.lessThan(root.<Integer>get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                    } else if (CompareCode.isGreaterOrEqual(compareCode)) {
+                        predicates.add(cb.greaterThanOrEqualTo(root.<Integer>get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                    } else if (CompareCode.isLessOrEqual(compareCode)) {
+                        predicates.add(cb.lessThanOrEqualTo(root.<Integer>get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                    }
+
+                    if (stockSearchCriteria.isTransformAction() && ((CompareCode.isLess(compareCode) || CompareCode.isLessOrEqual(compareCode)))) {
+                        predicates.add(cb.greaterThan(root.<Integer>get("stockAmount"), 0));
                     }
                 }
 
@@ -112,5 +116,33 @@ public class ProductStockInfoService {
         for (ProductStockInfo productStockInfo : productStockInfos) {
             this.productStockInfoRepository.saveAndFlush(productStockInfo);
         }
+    }
+
+    public int transformStock(List<ProductStockInfoDTO> stockInfoDTOList) {
+        for (ProductStockInfoDTO stock : stockInfoDTOList) {
+            ProductStockInfo semiStock = stock.getTargetProductStock();
+            ProductStockInfo endStock = stock.getRelatedProductStock();
+
+            endStock.setStockAmount(endStock.getStockAmount() + semiStock.getStockAmount());
+            endStock.setSize4Amount(endStock.getSize4Amount() + semiStock.getSize4Amount());
+            endStock.setSize5Amount(endStock.getSize5Amount() + semiStock.getSize5Amount());
+            endStock.setSize6Amount(endStock.getSize6Amount() + semiStock.getSize6Amount());
+            endStock.setSize7Amount(endStock.getSize7Amount() + semiStock.getSize7Amount());
+            endStock.setSize8Amount(endStock.getSize8Amount() + semiStock.getSize8Amount());
+            endStock.setSize9Amount(endStock.getSize9Amount() + semiStock.getSize9Amount());
+            endStock.setSize10Amount(endStock.getSize10Amount() + semiStock.getSize10Amount());
+
+            semiStock.setStockAmount(0);
+            semiStock.setSize4Amount(0);
+            semiStock.setSize5Amount(0);
+            semiStock.setSize6Amount(0);
+            semiStock.setSize7Amount(0);
+            semiStock.setSize8Amount(0);
+            semiStock.setSize9Amount(0);
+            semiStock.setSize10Amount(0);
+            this.saveProductStockInfo(semiStock);
+            this.saveProductStockInfo(endStock);
+        }
+        return 0;
     }
 }

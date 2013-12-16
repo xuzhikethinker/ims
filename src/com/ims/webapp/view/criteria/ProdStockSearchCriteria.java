@@ -16,6 +16,7 @@ public class ProdStockSearchCriteria {
     List<CompareCode> compareCodeList = new ArrayList<CompareCode>();
     private boolean requireCompareValue;
     private boolean includeComparedValue;
+    private boolean transformAction;
 
     public ProdStockSearchCriteria() {
     }
@@ -100,5 +101,13 @@ public class ProdStockSearchCriteria {
 
     public void setIncludeComparedValue(boolean includeComparedValue) {
         this.includeComparedValue = includeComparedValue;
+    }
+
+    public boolean isTransformAction() {
+        return transformAction;
+    }
+
+    public void setTransformAction(boolean transformAction) {
+        this.transformAction = transformAction;
     }
 }

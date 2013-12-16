@@ -3,6 +3,7 @@ package com.ims.webapp.view;
 import com.ims.domain.stock.ProductStockInfo;
 import com.ims.domain.stock.StockType;
 import com.ims.service.ProductStockInfoService;
+import com.ims.webapp.view.criteria.CompareCode;
 import com.ims.webapp.view.criteria.ProdStockSearchCriteria;
 import com.ims.webapp.view.dto.ProductStockAmountDTO;
 import com.ims.webapp.view.dto.ProductStockInfoDTO;
@@ -87,7 +88,7 @@ public class StockMaintainView extends BaseView {
     }
 
     public void onCancel(RowEditEvent event) {
-        FacesMessage msg = new FacesMessage("库存更新已被取消", "库存更新已被取消");
+        FacesMessage msg = new FacesMessage("库存更新", "库存更新已被取消");
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
@@ -133,5 +134,21 @@ public class StockMaintainView extends BaseView {
 
     public void setNewStockAmount(ProductStockAmountDTO newStockAmount) {
         this.newStockAmount = newStockAmount;
+    }
+
+    public String transformStock(){
+        if(StringUtils.isEmpty(stockSearchCriteria.getCompareCode())){
+            stockSearchCriteria.setCompareCode(CompareCode.GREATER.getCode());
+            stockSearchCriteria.setStockAmount(0);
+        }
+        stockSearchCriteria.setTransformAction(true);
+        stockSearchCriteria.setIncludeComparedValue(true);
+        filterProductStockList();
+
+        productStockInfoService.transformStock(stockInfoDTOList);
+        System.out.println("stockInfoDTOList size=" + stockInfoDTOList.size());
+        FacesMessage msg = new FacesMessage("批量转换半成品", "一共有 "+stockInfoDTOList.size() +" 种半成品库存被成功转换为成品库存。");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        return null;
     }
 }
