@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                template="/WEB-INF/template/layout.xhtml">
+
+<ui:define name="siteTitle">库存管理系统-首页</ui:define>
+
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewParam name="menuCode" value="#{stockMaintainView.menuCode}"/>
+        <f:viewAction action="#{stockMaintainView.loadData}" onPostback="false"/>
+    </f:metadata>
+</ui:define>
+
+<ui:define name="breadCrumbText">半成品--->成品转换</ui:define>
+<ui:define name="mainContentContainer">
+
+<h:panelGrid id="searchProdStockCriteria" columns="15">
+    <h:outputLabel for="prodType" value="产品类型:"/>
+    <p:selectOneMenu id="prodType" value="#{stockMaintainView.stockSearchCriteria.prodCategoryCode}"
+                     style="width: 120px;">
+        <f:selectItem itemLabel="所有产品类型" itemValue=""/>
+        <f:selectItems value="#{stockMaintainView.prodCategoryList}" var="category"
+                       itemLabel="#{category.categoryName}" itemValue="#{category.categoryName}"/>
+        <p:ajax  listener="#{stockMaintainView.filterProductStockList}"
+                process="searchProdStockCriteria"/>
+    </p:selectOneMenu>
+
+    <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+    <h:outputLabel for="stockAmount" value="库存总量: "/>
+    <p:selectOneMenu id="compareCode" value="#{stockMaintainView.stockSearchCriteria.compareCode}"
+                     style="width: 120px;">
+        <f:selectItem itemLabel="选择比较符" itemValue=""/>
+        <f:selectItems value="#{stockMaintainView.stockSearchCriteria.compareCodeList}" var="compare"
+                       itemLabel="#{compare.displayName}" itemValue="#{compare.code}"/>
+        <p:ajax update="searchProdStockCriteria" listener="#{stockMaintainView.enableCompareValueInput}"
+                process="searchProdStockCriteria"/>
+    </p:selectOneMenu>
+    <p:inputText id="stockAmount" value="#{stockMaintainView.stockSearchCriteria.stockAmount}" style="width: 50px;"
+                 required="#{stockMaintainView.stockSearchCriteria.requireCompareValue}"
+                 rendered="#{stockMaintainView.stockSearchCriteria.requireCompareValue}" requiredMessage="请输入比较的数量"
+                 converterMessage="比较数量必须是数字">
+        <o:validator validatorId="javax.faces.LongRange" for="stockAmount"
+                     minimum="0" message="比较数量必须大于或等于0"/>
+        <!--<p:ajax update="stockAmount" event="blur" />-->
+        <p:clientValidator/>
+    </p:inputText>
+
+    <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+    <h:outputLabel for="prodCode" value="产品代号: "/>
+    <p:inputText id="prodCode" value="#{stockMaintainView.stockSearchCriteria.prodCode}" style="width: 120px;"/>
+
+    <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+    <p:commandButton id="btn_searchProdInfo" value="转换" process="searchProdStockCriteria" update=":form:successMessage"
+                     action="#{stockMaintainView.transformStock}">
+    </p:commandButton>
+</h:panelGrid>
+    <p:growl id="successMessage" showDetail="true"/>
+</ui:define>
+</ui:composition>
