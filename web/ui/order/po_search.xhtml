@@ -1,0 +1,33 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="siteTitle">库存管理系统-PO管理</ui:define>
+    <ui:define name="breadCrumbText">查找PO</ui:define>
+    <ui:define name="mainContentContainer">
+        <h:panelGrid id="searchPOCriteria" columns="10">
+            <h:outputLabel for="prodType" value="PO状态:"/>
+            <p:selectOneMenu id="prodType" value="#{orderMaintainView.orderSearchCriteria.purchaseOrderStatus}"  style="width: 120px;">
+                <f:selectItem itemLabel="所有状态" itemValue=""/>
+                <f:selectItems value="#{supportDataMaintainView.prodCategoryList}" var="category"
+                               itemLabel="#{category.categoryName}" itemValue="#{category.categoryName}"/>
+                <p:ajax update="productsTable" listener="#{supportDataMaintainView.filterProductInfoList}" process="searchProdCriteria"/>
+            </p:selectOneMenu>
+
+            <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+            <h:outputLabel for="poNum" value="PO No.: "/>
+            <p:inputText id="poNum" value="#{orderMaintainView.orderSearchCriteria.purchaseOrderNum}"  style="width: 120px;"/>
+
+            <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+            <h:outputLabel for="piNum" value="PI No.: "/>
+            <p:inputText id="piNum" value="#{orderMaintainView.orderSearchCriteria.proformaInvoiceNum}"  style="width: 120px;"/>
+
+            <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+            <p:commandButton id="btn_searchProdInfo" value="查找" process="searchPOCriteria" update="@this" action="#{supportDataMaintainView.searchProdInfo}">
+            </p:commandButton>
+        </h:panelGrid>
+    </ui:define>
+</ui:composition>

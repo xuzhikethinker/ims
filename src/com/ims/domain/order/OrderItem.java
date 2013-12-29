@@ -6,9 +6,11 @@
 package com.ims.domain.order;
 
 import com.ims.domain.PersistenceDomain;
+import com.ims.domain.support.ProductAmount;
 import com.ims.domain.support.ProductInfo;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
@@ -27,17 +29,14 @@ public abstract class OrderItem extends PersistenceDomain {
     @Transient
     private ProductInfo productInfo;
 
-    @Column(name = "COMP_PROD_SIZE")
-    private int productSize;
-
-    @Column(name = "QUANTITY")
-    private int quantity;
+    @Embedded
+    private ProductAmount productAmount = new ProductAmount();
 
     @Column(name = "UNIT_PRICE")
     private double unitPrice;
 
-    @Column(name = "TOTAL_AMOUNT")
-    private double totalAmount;
+    @Column(name = "TOTAL_PRICE")
+    private double totalPrice;
 
     @Column(name = "DISPLAY_SEQ")
     private int displaySeq;
@@ -66,22 +65,6 @@ public abstract class OrderItem extends PersistenceDomain {
         this.productInfo = productInfo;
     }
 
-    public int getProductSize() {
-        return productSize;
-    }
-
-    public void setProductSize(int productSize) {
-        this.productSize = productSize;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
     public double getUnitPrice() {
         return unitPrice;
     }
@@ -90,12 +73,12 @@ public abstract class OrderItem extends PersistenceDomain {
         this.unitPrice = unitPrice;
     }
 
-    public double getTotalAmount() {
-        return totalAmount;
+    public double getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public int getDisplaySeq() {
@@ -106,4 +89,11 @@ public abstract class OrderItem extends PersistenceDomain {
         this.displaySeq = displaySeq;
     }
 
+    public ProductAmount getProductAmount() {
+        return productAmount;
+    }
+
+    public void setProductAmount(ProductAmount productAmount) {
+        this.productAmount = productAmount;
+    }
 }

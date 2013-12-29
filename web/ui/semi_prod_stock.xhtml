@@ -6,25 +6,7 @@
                 xmlns:o="http://omnifaces.org/ui"
                 template="/WEB-INF/template/layout.xhtml">
 
-<ui:define name="siteTitle">库存管理系统-首页</ui:define>
-
-<ui:define name="jsLib">
-    <script language="JavaScript">
-        function setSemiProdStockAmount() {
-            if ($("#supportSize").val() == 'true') {
-                $("#size4Amount").val($("#size4Amount_readonly").html());
-                $("#size5Amount").val($("#size5Amount_readonly").html());
-                $("#size6Amount").val($("#size6Amount_readonly").html());
-                $("#size7Amount").val($("#size7Amount_readonly").html());
-                $("#size8Amount").val($("#size8Amount_readonly").html());
-                $("#size9Amount").val($("#size9Amount_readonly").html());
-                $("#size10Amount").val($("#size10Amount_readonly").html());
-            } else if($("#supportSize").val() == 'false') {
-            $("#newStockAmount").val($("#stockAmount_readonly").html());
-            }
-        }
-    </script>
-</ui:define>
+<ui:define name="siteTitle">库存管理系统-半成品库存</ui:define>
 
 <ui:define name="metadata">
     <f:metadata>
@@ -90,20 +72,21 @@
     <p:row>
         <p:column rowspan="2" headerText="产品代码" styleClass="table_header" style="width:10%"/>
         <p:column rowspan="2" headerText="产品类别" styleClass="table_header" style="width:10%"/>
-        <p:column colspan="8" headerText="产品数量" styleClass="table_header"/>
+        <p:column colspan="9" headerText="产品数量" styleClass="table_header"/>
         <p:column rowspan="2" headerText="操作" styleClass="table_header"/>
         <p:column rowspan="2" headerText="转换成品" styleClass="table_header"/>
     </p:row>
 
     <p:row>
-        <p:column headerText="#4" styleClass="table_header" style="width:8%"/>
-        <p:column headerText="#5" styleClass="table_header" style="width:8%"/>
-        <p:column headerText="#6" styleClass="table_header" style="width:8%"/>
-        <p:column headerText="#7" styleClass="table_header" style="width:8%"/>
-        <p:column headerText="#8" styleClass="table_header" style="width:8%"/>
-        <p:column headerText="#9" styleClass="table_header" style="width:8%"/>
-        <p:column headerText="#10" styleClass="table_header" style="width:8%"/>
-        <p:column headerText="总数" styleClass="table_header" style="width:8%"/>
+        <p:column headerText="#4" styleClass="table_header" style="width:7%"/>
+        <p:column headerText="#5" styleClass="table_header" style="width:7%"/>
+        <p:column headerText="#6" styleClass="table_header" style="width:7%"/>
+        <p:column headerText="#7" styleClass="table_header" style="width:7%"/>
+        <p:column headerText="#8" styleClass="table_header" style="width:7%"/>
+        <p:column headerText="#9" styleClass="table_header" style="width:7%"/>
+        <p:column headerText="#10" styleClass="table_header" style="width:7%"/>
+        <p:column headerText="总数" styleClass="table_header" style="width:7%"/>
+        <p:column headerText="预警数" styleClass="table_header" style="width:7%"/>
     </p:row>
 </p:columnGroup>
 
@@ -118,11 +101,11 @@
 <p:column>
     <p:cellEditor>
         <f:facet name="output">
-            <h:outputText value="#{product.targetProductStock.size4Amount}"
+            <h:outputText value="#{product.targetProductStock.productAmount.size4Amount}"
                           rendered="#{product.targetProductStock.supportSize}"/>
         </f:facet>
         <f:facet name="input">
-            <p:inputText value="#{product.targetProductStock.size4Amount}"
+            <p:inputText value="#{product.targetProductStock.productAmount.size4Amount}"
                          rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
         </f:facet>
     </p:cellEditor>
@@ -131,11 +114,11 @@
 <p:column>
     <p:cellEditor>
         <f:facet name="output">
-            <h:outputText value="#{product.targetProductStock.size5Amount}"
+            <h:outputText value="#{product.targetProductStock.productAmount.size5Amount}"
                           rendered="#{product.targetProductStock.supportSize}"/>
         </f:facet>
         <f:facet name="input">
-            <p:inputText value="#{product.targetProductStock.size5Amount}"
+            <p:inputText value="#{product.targetProductStock.productAmount.size5Amount}"
                          rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
         </f:facet>
     </p:cellEditor>
@@ -144,11 +127,11 @@
 <p:column>
     <p:cellEditor>
         <f:facet name="output">
-            <h:outputText value="#{product.targetProductStock.size6Amount}"
+            <h:outputText value="#{product.targetProductStock.productAmount.size6Amount}"
                           rendered="#{product.targetProductStock.supportSize}"/>
         </f:facet>
         <f:facet name="input">
-            <p:inputText value="#{product.targetProductStock.size6Amount}"
+            <p:inputText value="#{product.targetProductStock.productAmount.size6Amount}"
                          rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
         </f:facet>
     </p:cellEditor>
@@ -157,11 +140,11 @@
 <p:column>
     <p:cellEditor>
         <f:facet name="output">
-            <h:outputText value="#{product.targetProductStock.size7Amount}"
+            <h:outputText value="#{product.targetProductStock.productAmount.size7Amount}"
                           rendered="#{product.targetProductStock.supportSize}"/>
         </f:facet>
         <f:facet name="input">
-            <p:inputText value="#{product.targetProductStock.size7Amount}"
+            <p:inputText value="#{product.targetProductStock.productAmount.size7Amount}"
                          rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
         </f:facet>
     </p:cellEditor>
@@ -170,11 +153,11 @@
 <p:column>
     <p:cellEditor>
         <f:facet name="output">
-            <h:outputText value="#{product.targetProductStock.size8Amount}"
+            <h:outputText value="#{product.targetProductStock.productAmount.size8Amount}"
                           rendered="#{product.targetProductStock.supportSize}"/>
         </f:facet>
         <f:facet name="input">
-            <p:inputText value="#{product.targetProductStock.size8Amount}"
+            <p:inputText value="#{product.targetProductStock.productAmount.size8Amount}"
                          rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
         </f:facet>
     </p:cellEditor>
@@ -183,11 +166,11 @@
 <p:column>
     <p:cellEditor>
         <f:facet name="output">
-            <h:outputText value="#{product.targetProductStock.size9Amount}"
+            <h:outputText value="#{product.targetProductStock.productAmount.size9Amount}"
                           rendered="#{product.targetProductStock.supportSize}"/>
         </f:facet>
         <f:facet name="input">
-            <p:inputText value="#{product.targetProductStock.size9Amount}"
+            <p:inputText value="#{product.targetProductStock.productAmount.size9Amount}"
                          rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
         </f:facet>
     </p:cellEditor>
@@ -196,11 +179,11 @@
 <p:column>
     <p:cellEditor>
         <f:facet name="output">
-            <h:outputText value="#{product.targetProductStock.size10Amount}"
+            <h:outputText value="#{product.targetProductStock.productAmount.size10Amount}"
                           rendered="#{product.targetProductStock.supportSize}"/>
         </f:facet>
         <f:facet name="input">
-            <p:inputText value="#{product.targetProductStock.size10Amount}"
+            <p:inputText value="#{product.targetProductStock.productAmount.size10Amount}"
                          rendered="#{product.targetProductStock.supportSize}" style="width:100%"/>
         </f:facet>
     </p:cellEditor>
@@ -209,11 +192,22 @@
 <p:column>
     <p:cellEditor>
         <f:facet name="output">
-            <h:outputText value="#{product.targetProductStock.stockAmount}"/>
+            <h:outputText value="#{product.targetProductStock.productAmount.totalAmount}"/>
         </f:facet>
         <f:facet name="input">
-            <p:inputText value="#{product.targetProductStock.stockAmount}"
+            <p:inputText value="#{product.targetProductStock.productAmount.totalAmount}"
                          rendered="#{!product.targetProductStock.supportSize}" style="width:100%"/>
+        </f:facet>
+    </p:cellEditor>
+</p:column>
+
+<p:column>
+    <p:cellEditor>
+        <f:facet name="output">
+            <h:outputText value="#{product.targetProductStock.alertStockAmount}"/>
+        </f:facet>
+        <f:facet name="input">
+            <p:inputText value="#{product.targetProductStock.alertStockAmount}" style="width:100%"/>
         </f:facet>
     </p:cellEditor>
 </p:column>
@@ -223,7 +217,7 @@
 </p:column>
 <p:column>
     <p:commandLink style="margin-right:20px;" update=":form" ajax="true" process="@this"
-                   oncomplete="PF('semiProdDialog').show()" rendered="#{product.targetProductStock.stockAmount>0}">
+                   oncomplete="PF('semiProdDialog').show()" rendered="#{product.targetProductStock.productAmount.totalAmount>0}">
         <h:outputText value="转换"/>
         <f:setPropertyActionListener value="convertStock" target="#{stockMaintainView.action}"/>
         <f:setPropertyActionListener value="#{product.targetProductStock}"

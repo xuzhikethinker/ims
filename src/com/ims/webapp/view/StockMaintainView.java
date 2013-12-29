@@ -2,6 +2,7 @@ package com.ims.webapp.view;
 
 import com.ims.domain.stock.ProductStockInfo;
 import com.ims.domain.stock.StockType;
+import com.ims.domain.support.ProductAmount;
 import com.ims.service.ProductStockInfoService;
 import com.ims.webapp.view.criteria.CompareCode;
 import com.ims.webapp.view.criteria.ProdStockSearchCriteria;
@@ -24,6 +25,7 @@ public class StockMaintainView extends BaseView {
     private List<ProductStockInfoDTO> stockInfoDTOList = new ArrayList<ProductStockInfoDTO>();
     private ProdStockSearchCriteria stockSearchCriteria = new ProdStockSearchCriteria();
     private ProductStockAmountDTO newStockAmount = new ProductStockAmountDTO();
+    private List<ProductStockInfo> alertedStockInfoList = new ArrayList<ProductStockInfo>();
 
     private ProductStockInfo selectedProductStock;
 
@@ -41,18 +43,30 @@ public class StockMaintainView extends BaseView {
 //        stockSearchCriteria.setStockType(StockType.Finished.getCode());
 //        this.endProdStockList = this.productStockInfoService.findProdStockInfoListFrom(stockSearchCriteria);
         prodCategoryList = this.supportingDataService.loadProdCategoryList(false);
-        Map<String, ProductStockInfo> semiStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey( new ProdStockSearchCriteria(StockType.Semifinished.getCode()));
-        Map<String, ProductStockInfo> endStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey( new ProdStockSearchCriteria(StockType.Finished.getCode()));
-        buildStockInfoDTO(semiStockMap,endStockMap);
+        Map<String, ProductStockInfo> semiStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey(new ProdStockSearchCriteria(StockType.Semifinished.getCode()));
+        Map<String, ProductStockInfo> endStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey(new ProdStockSearchCriteria(StockType.Finished.getCode()));
+        buildStockInfoDTO(semiStockMap, endStockMap);
+    }
+
+    public void loadAlertData(){
+        ProdStockSearchCriteria criteria = new ProdStockSearchCriteria();
+        criteria.setStockType(StockType.Semifinished.getCode());
+        criteria.setIncludeComparedValue(true);
+        criteria.setCompareCode(CompareCode.LESS_ALERT.getCode());
+        Map<String, ProductStockInfo> semiStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey(criteria);
+        criteria.setStockType(StockType.Finished.getCode());
+        Map<String, ProductStockInfo> endStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey(criteria);
+        buildStockInfoDTO(semiStockMap, endStockMap);
     }
 
     private void buildStockInfoDTO(Map<String, ProductStockInfo> semiStockMap, Map<String, ProductStockInfo> endStockMap) {
-               boolean semiProdStock = ProductStockInfoService.SEMI_PROD_STOCK.equalsIgnoreCase(getMenuCode());
+        boolean semiProdStock = ProductStockInfoService.SEMI_PROD_STOCK.equalsIgnoreCase(getMenuCode());
         for (String prodCode : endStockMap.keySet()) {
             ProductStockInfoDTO stockInfoDTO = new ProductStockInfoDTO(semiProdStock ? StockType.Semifinished.getCode() : StockType.Finished.getCode());
             ProductStockInfo targetStock = semiProdStock ? semiStockMap.get(prodCode) : endStockMap.get(prodCode);
             ProductStockInfo relatedStock = semiProdStock ? endStockMap.get(prodCode) : semiStockMap.get(prodCode);
             if (targetStock != null) {
+                stockInfoDTO.setProductCode(prodCode);
                 stockInfoDTO.setTargetProductStock(targetStock);
                 stockInfoDTO.setRelatedProductStock(relatedStock);
                 stockInfoDTOList.add(stockInfoDTO);
@@ -60,7 +74,7 @@ public class StockMaintainView extends BaseView {
         }
     }
 
-    public void filterProductStockList(){
+    public void filterProductStockList() {
         stockInfoDTOList.clear();
         stockSearchCriteria.setStockType(StockType.Semifinished.getCode());
         stockSearchCriteria.setIncludeComparedValue(ProductStockInfoService.SEMI_PROD_STOCK.equalsIgnoreCase(getMenuCode()));
@@ -69,20 +83,26 @@ public class StockMaintainView extends BaseView {
         stockSearchCriteria.setStockType(StockType.Finished.getCode());
         stockSearchCriteria.setIncludeComparedValue(ProductStockInfoService.END_PROD_STOCK.equalsIgnoreCase(getMenuCode()));
         Map<String, ProductStockInfo> endStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey(stockSearchCriteria);
-        buildStockInfoDTO(semiStockMap,endStockMap);
+        buildStockInfoDTO(semiStockMap, endStockMap);
     }
 
-    public void enableCompareValueInput(){
-        stockSearchCriteria.setRequireCompareValue(StringUtils.isNotEmpty(stockSearchCriteria.getCompareCode()));
+    public void enableCompareValueInput() {
+        String compareCode = stockSearchCriteria.getCompareCode();
+        stockSearchCriteria.setRequireCompareValue(StringUtils.isNotEmpty(compareCode) && (CompareCode.isEqual(compareCode) || CompareCode.isGreater(compareCode) || CompareCode.isGreaterOrEqual(compareCode) || CompareCode.isLess(compareCode) || CompareCode.isLessOrEqual(compareCode)));
     }
 
     public void editProdStock(RowEditEvent event) {
         ProductStockInfoDTO stockInfoDTO = (ProductStockInfoDTO) event.getObject();
         FacesMessage msg = new FacesMessage(stockInfoDTO.getTargetProductStock().getProductCode() + " 库存数量成功更新", stockInfoDTO.getTargetProductStock().getProductCode() + " 库存数量成功更新");
-        this.productStockInfoService.updateProdcutStockInfo(stockInfoDTO);
+        this.productStockInfoService.updateProdcutStockInfo(stockInfoDTO,false);
         System.out.println(stockInfoDTO.getTargetProductStock());
-        stockInfoDTO.getTargetProductStock().setVersion(stockInfoDTO.getTargetProductStock().getVersion() + 1);
-        stockInfoDTO.getRelatedProductStock().setVersion(stockInfoDTO.getRelatedProductStock().getVersion() + 1);
+        if (stockInfoDTO.getTargetStockType() == StockType.Finished.getCode()){
+            stockInfoDTO.getTargetProductStock().setVersion(stockInfoDTO.getTargetProductStock().getVersion() + 1);
+            stockInfoDTO.getRelatedProductStock().setVersion(stockInfoDTO.getRelatedProductStock().getVersion() + 1);
+        }else{
+            stockInfoDTO.getTargetProductStock().setVersion(stockInfoDTO.getTargetProductStock().getVersion() + 1);
+        }
+
         stockInfoDTO.resetNewStockAmount();
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
@@ -105,26 +125,40 @@ public class StockMaintainView extends BaseView {
     }
 
     public void setSelectedProductStock(ProductStockInfo selectedProductStock) {
-        if(selectedProductStock!=null && StringUtils.isNotEmpty(this.getAction()) && ACTION_CONVERT_STOCK.equalsIgnoreCase(this.getAction())){
-            newStockAmount.setStockAmount(selectedProductStock.getStockAmount());
-            newStockAmount.setSize10Amount(selectedProductStock.getSize10Amount());
-            newStockAmount.setSize9Amount(selectedProductStock.getSize9Amount());
-            newStockAmount.setSize8Amount(selectedProductStock.getSize8Amount());
-            newStockAmount.setSize7Amount(selectedProductStock.getSize7Amount());
-            newStockAmount.setSize4Amount(selectedProductStock.getSize4Amount());
-            newStockAmount.setSize5Amount(selectedProductStock.getSize5Amount());
-            newStockAmount.setSize6Amount(selectedProductStock.getSize6Amount());
+        if (selectedProductStock != null && StringUtils.isNotEmpty(this.getAction()) && ACTION_CONVERT_STOCK.equalsIgnoreCase(this.getAction())) {
+            ProductAmount selectedProdAmount = selectedProductStock.getProductAmount();
+            newStockAmount.setStockAmount(selectedProdAmount.getTotalAmount());
+            newStockAmount.setSize10Amount(selectedProdAmount.getSize10Amount());
+            newStockAmount.setSize9Amount(selectedProdAmount.getSize9Amount());
+            newStockAmount.setSize8Amount(selectedProdAmount.getSize8Amount());
+            newStockAmount.setSize7Amount(selectedProdAmount.getSize7Amount());
+            newStockAmount.setSize4Amount(selectedProdAmount.getSize4Amount());
+            newStockAmount.setSize5Amount(selectedProdAmount.getSize5Amount());
+            newStockAmount.setSize6Amount(selectedProdAmount.getSize6Amount());
         }
         this.selectedProductStock = selectedProductStock;
     }
 
-    public String convertToFinishedProd(){
+    public String convertToFinishedProd() {
         System.out.println("selected stock=" + selectedProductStock);
-
+        ProductStockInfoDTO targetStockDTO = null;
+        for(ProductStockInfoDTO stockInfoDTO: stockInfoDTOList){
+            if(stockInfoDTO.getProductCode().equalsIgnoreCase(selectedProductStock.getProductCode())){
+                targetStockDTO = stockInfoDTO;
+                break;
+            }
+        }
+        targetStockDTO.setNewStockAmount(this.newStockAmount);
+        this.productStockInfoService.updateProdcutStockInfo(targetStockDTO, true);
+        targetStockDTO.getTargetProductStock().setVersion(targetStockDTO.getTargetProductStock().getVersion() + 1);
+        targetStockDTO.getRelatedProductStock().setVersion(targetStockDTO.getRelatedProductStock().getVersion() + 1);
+        targetStockDTO.resetNewStockAmount();
+        FacesMessage msg = new FacesMessage("半成品转换", "半成品转换成品库存成功保存");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
         return null;
     }
 
-    private void updateStockAmount(ProductStockInfo selectedProductStock,ProductStockAmountDTO newStockAmount){
+    private void updateStockAmount(ProductStockInfo selectedProductStock, ProductStockAmountDTO newStockAmount) {
 
     }
 
@@ -136,8 +170,8 @@ public class StockMaintainView extends BaseView {
         this.newStockAmount = newStockAmount;
     }
 
-    public String transformStock(){
-        if(StringUtils.isEmpty(stockSearchCriteria.getCompareCode())){
+    public String transformStock() {
+        if (StringUtils.isEmpty(stockSearchCriteria.getCompareCode())) {
             stockSearchCriteria.setCompareCode(CompareCode.GREATER.getCode());
             stockSearchCriteria.setStockAmount(0);
         }
@@ -147,8 +181,28 @@ public class StockMaintainView extends BaseView {
 
         productStockInfoService.transformStock(stockInfoDTOList);
         System.out.println("stockInfoDTOList size=" + stockInfoDTOList.size());
-        FacesMessage msg = new FacesMessage("批量转换半成品", "一共有 "+stockInfoDTOList.size() +" 种半成品库存被成功转换为成品库存。");
+        FacesMessage msg = new FacesMessage("批量转换半成品", "一共有 " + stockInfoDTOList.size() + " 种半成品库存被成功转换为成品库存。");
         FacesContext.getCurrentInstance().addMessage(null, msg);
         return null;
+    }
+
+    public String updateStockAlertAmount() {
+        int count = productStockInfoService.updateStockAlertAmount(stockSearchCriteria);
+        FacesMessage msg = new FacesMessage("批量设置库存预警量", "一共有 " + count + " 种产品成功设置预警量。");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        return null;
+    }
+
+    public String retrieveStockListLessThanAlertAmount() {
+        alertedStockInfoList = productStockInfoService.getAlertedStockInfoList(0);
+        return null;
+    }
+
+    public List<ProductStockInfo> getAlertedStockInfoList() {
+        return alertedStockInfoList;
+    }
+
+    public void setAlertedStockInfoList(List<ProductStockInfo> alertedStockInfoList) {
+        this.alertedStockInfoList = alertedStockInfoList;
     }
 }

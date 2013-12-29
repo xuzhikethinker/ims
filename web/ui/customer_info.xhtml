@@ -2,8 +2,46 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template/layout.xhtml">
 
-    <ui:define name="siteTitle">库存管理系统-首页</ui:define>
-    <ui:define name="mainContentContainer">客户信息管理</ui:define>
+    <ui:define name="siteTitle">库存管理系统-客户信息</ui:define>
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="menuCode" value="#{customerView.menuCode}"/>
+            <f:viewParam name="action" value="#{customerView.action}"/>
+            <f:viewAction action="#{customerView.loadData}" onPostback="false"/>
+        </f:metadata>
+    </ui:define>
+    <ui:define name="breadCrumbText">客户信息</ui:define>
+    <ui:define name="mainContentContainer">
+        <p:messages autoUpdate="true"  id="customerMessage"  showDetail="true" showSummary="false"/>
+        <h:panelGrid columns="2" cellpadding="4" id="saveCustomer">
+            <h:outputText value="客户名称:"/>
+            <h:inputText value="#{customerView.customerInfo.customerName}" required="true"
+                         requiredMessage="客户名称不可为空">
+            </h:inputText>
+
+            <h:outputText value="地址:"/>
+            <h:inputText value="#{customerView.customerInfo.contact.address}"/>
+
+            <h:outputText value="电话:"/>
+            <h:inputText value="#{customerView.customerInfo.contact.phoneNum}"/>
+
+            <h:outputText value="传真:"/>
+            <h:inputText value="#{customerView.customerInfo.contact.faxNum}"/>
+
+            <h:outputText value="邮箱:"/>
+            <h:inputText value="#{customerView.customerInfo.contact.email}"/>
+
+            <h:outputText value="联系人:"/>
+            <h:inputText value="#{customerView.customerInfo.contact.contactName}"/>
+
+            <p:commandButton id="btn_add" value="保存"
+                             update=":form:customerMessage" validateClient="true" ajax="true" process="saveCustomer"
+                             action="#{customerView.saveCustomer}">
+            </p:commandButton>
+
+        </h:panelGrid>
+    </ui:define>
 </ui:composition>

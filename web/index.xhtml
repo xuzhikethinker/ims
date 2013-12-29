@@ -4,6 +4,14 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 template="/WEB-INF/template/layout.xhtml">
 
-    <ui:define name="siteTitle">库存管理系统88-首页</ui:define>
+    <ui:define name="siteTitle">库存管理系统-首页</ui:define>
+
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="menuCode" value="#{stockMaintainView.menuCode}"/>
+            <f:viewAction action="#{stockMaintainView.loadAlertData}" onPostback="false"/>
+        </f:metadata>
+    </ui:define>
+
     <ui:define name="mainContentContainer"><ui:include src="./ui/dashboard.xhtml"></ui:include></ui:define>
 </ui:composition>

@@ -9,7 +9,9 @@ import com.ims.domain.PersistenceDomain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Administrator
@@ -88,6 +90,14 @@ public class ProductCategory extends PersistenceDomain {
     public void addProductInfo(ProductInfo prod) {
         prod.setCategory(this);
         this.productList.add(prod);
+    }
+
+    public Map<String, ProductInfo> getProductInfoMap(){
+        Map<String, ProductInfo> productInfoMap = new HashMap<String, ProductInfo>();
+        for(ProductInfo productInfo:this.productList){
+            productInfoMap.put(productInfo.getProductCode(),productInfo);
+        }
+        return productInfoMap;
     }
 
 }

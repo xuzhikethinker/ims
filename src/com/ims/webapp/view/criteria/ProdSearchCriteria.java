@@ -6,6 +6,7 @@ package com.ims.webapp.view.criteria;
 public class ProdSearchCriteria {
     private String prodCategoryCode;
     private String prodCode;
+    private String custProdCode;
 
     public String getProdCategoryCode() {
         return prodCategoryCode;
@@ -21,6 +22,14 @@ public class ProdSearchCriteria {
 
     public void setProdCode(String prodCode) {
         this.prodCode = prodCode;
+    }
+
+    public String getCustProdCode() {
+        return custProdCode;
+    }
+
+    public void setCustProdCode(String custProdCode) {
+        this.custProdCode = custProdCode;
     }
 
     @Override

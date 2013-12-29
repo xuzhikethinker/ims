@@ -15,14 +15,6 @@
     </f:metadata>
 </ui:define>
 
-<ui:define name="jsLib">
-<script language="JavaScript">
-    function changeCompareCode(){
-        alert("value");
-    }
-</script>
-</ui:define>
-
 <ui:define name="breadCrumbText">成品库存管理</ui:define>
 <ui:define name="mainContentContainer">
     <p:growl id="messages1" showDetail="false"/>
@@ -69,19 +61,20 @@
                 <p:row>
                     <p:column rowspan="2" headerText="产品代码" styleClass="table_header" style="width:8%"/>
                     <p:column rowspan="2" headerText="产品类别" styleClass="table_header"  style="width:8%"/>
-                    <p:column colspan="8" headerText="产品数量" styleClass="table_header"/>
+                    <p:column colspan="9" headerText="产品数量" styleClass="table_header"/>
                     <p:column rowspan="2" headerText="操作" styleClass="table_header"/>
                 </p:row>
 
                 <p:row>
-                    <p:column headerText="#4" styleClass="table_header" style="width:9%"/>
-                    <p:column headerText="#5" styleClass="table_header" style="width:9%"/>
-                    <p:column headerText="#6" styleClass="table_header" style="width:9%"/>
-                    <p:column headerText="#7" styleClass="table_header" style="width:9%"/>
-                    <p:column headerText="#8" styleClass="table_header" style="width:9%"/>
-                    <p:column headerText="#9" styleClass="table_header" style="width:9%"/>
-                    <p:column headerText="#10" styleClass="table_header" style="width:9%"/>
-                    <p:column headerText="总数" styleClass="table_header" style="width:9%; font-weight: bold;"/>
+                    <p:column headerText="#4" styleClass="table_header" style="width:8%"/>
+                    <p:column headerText="#5" styleClass="table_header" style="width:8%"/>
+                    <p:column headerText="#6" styleClass="table_header" style="width:8%"/>
+                    <p:column headerText="#7" styleClass="table_header" style="width:8%"/>
+                    <p:column headerText="#8" styleClass="table_header" style="width:8%"/>
+                    <p:column headerText="#9" styleClass="table_header" style="width:8%"/>
+                    <p:column headerText="#10" styleClass="table_header" style="width:8%"/>
+                    <p:column headerText="总数" styleClass="table_header" style="width:8%; font-weight: bold;"/>
+                    <p:column headerText="预警数" styleClass="table_header" style="width:8%; font-weight: bold;"/>
                 </p:row>
             </p:columnGroup>
 
@@ -244,9 +237,23 @@
                 </p:cellEditor>
             </p:column>
 
+            <p:column>
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.targetProductStock.alertStockAmount}" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:inputText value="#{product.targetProductStock.alertStockAmount}" style="width:80%">
+                            <o:validator validatorId="javax.faces.LongRange"
+                                         minimum="1" message="预警数必须 大于0" />
+                            <p:clientValidator />
+                        </p:inputText>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
             <p:column style="width:6%">
-                <!--<p:rowEditor/>-->
-                <p:rowEditor rendered="#{product.relatedProductStock.stockAmount>0 or product.relatedProductStock.size4Amount>0 or product.relatedProductStock.size5Amount>0 or product.relatedProductStock.size6Amount>0 or product.relatedProductStock.size7Amount>0 or product.relatedProductStock.size8Amount>0 or product.relatedProductStock.size9Amount>0 or product.relatedProductStock.size10Amount>0}"/>
+                <p:rowEditor/>
+                <!--<p:rowEditor rendered="#{product.relatedProductStock.stockAmount>0 or product.relatedProductStock.size4Amount>0 or product.relatedProductStock.size5Amount>0 or product.relatedProductStock.size6Amount>0 or product.relatedProductStock.size7Amount>0 or product.relatedProductStock.size8Amount>0 or product.relatedProductStock.size9Amount>0 or product.relatedProductStock.size10Amount>0}"/>-->
             </p:column>
 
             <!--<p:column styleClass="table_header">-->

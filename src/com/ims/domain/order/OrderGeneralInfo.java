@@ -12,7 +12,6 @@ import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
-import java.util.Date;
 
 /**
  * @author Administrator
@@ -35,13 +34,11 @@ public class OrderGeneralInfo extends PersistenceDomain {
     @Column(name = "PO_REQUIREMENT_REMARKS")
     private String orderRequirementRemarks;
 
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "ORDER_SUBMIT_DATE")
-    private Date orderSubmitDate;
+    private String orderSubmitDate;
 
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "ORDER_DELIVERY_DATE")
-    private Date deliveryDate;
+    private String deliveryDate;
 
     public String getOrderRequirementRemarks() {
         return orderRequirementRemarks;
@@ -51,19 +48,19 @@ public class OrderGeneralInfo extends PersistenceDomain {
         this.orderRequirementRemarks = orderRequirementRemarks;
     }
 
-    public Date getOrderSubmitDate() {
+    public String getOrderSubmitDate() {
         return orderSubmitDate;
     }
 
-    public void setOrderSubmitDate(Date orderSubmitDate) {
+    public void setOrderSubmitDate(String orderSubmitDate) {
         this.orderSubmitDate = orderSubmitDate;
     }
 
-    public Date getDeliveryDate() {
+    public String getDeliveryDate() {
         return deliveryDate;
     }
 
-    public void setDeliveryDate(Date deliveryDate) {
+    public void setDeliveryDate(String deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
 

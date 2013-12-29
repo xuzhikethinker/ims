@@ -7,6 +7,7 @@ import java.util.List;
  * Created by Administrator on 13-12-10.
  */
 public class ProdStockSearchCriteria {
+    public static final int NO_STOCK_TYPE=-1;
     private int stockType;
     private String prodCategoryCode;
     private String prodCode;
@@ -14,6 +15,7 @@ public class ProdStockSearchCriteria {
     private int stockAmount;
     private String compareCode;
     List<CompareCode> compareCodeList = new ArrayList<CompareCode>();
+    List<CompareCode> compareCodeListWithoutAlert = new ArrayList<CompareCode>();
     private boolean requireCompareValue;
     private boolean includeComparedValue;
     private boolean transformAction;
@@ -81,6 +83,16 @@ public class ProdStockSearchCriteria {
         compareCodeList.clear();
         for (CompareCode compare : CompareCode.values()) {
             if (compare != CompareCode.EMPTY) {
+                compareCodeList.add(compare);
+            }
+        }
+        return compareCodeList;
+    }
+
+    public List<CompareCode> getCompareCodeWithoutAlertList() {
+        compareCodeList.clear();
+        for (CompareCode compare : CompareCode.values()) {
+            if (compare != CompareCode.EMPTY && compare!=CompareCode.ET_ALERT && compare != CompareCode.GREATER_ALERT && compare !=CompareCode.LESS_ALERT) {
                 compareCodeList.add(compare);
             }
         }

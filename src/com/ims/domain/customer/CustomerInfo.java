@@ -26,11 +26,12 @@ public class CustomerInfo extends PersistenceDomain {
     private String customerCode;
 
     @Embedded
-    private ContactInfo contact;
+    private ContactInfo contact = new ContactInfo();
 
     //    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)//级联保存、更新、删除、刷新;延迟加载
-    @JoinColumn(name = "CUSTOMER_ID")//在book表增加一个外键列来实现一对多的单向关联
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)//级联保存、更新、删除、刷新;延迟加载
+//    @JoinColumn(name = "CUSTOMER_ID")//在book表增加一个外键列来实现一对多的单向关联
+    @Transient
     private List<CustomerProductCodeMap> productCodeMap;
 
     public CustomerInfo() {

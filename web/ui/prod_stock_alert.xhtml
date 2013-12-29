@@ -2,8 +2,50 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
                 template="/WEB-INF/template/layout.xhtml">
 
     <ui:define name="siteTitle">库存管理系统-首页</ui:define>
-    <ui:define name="mainContentContainer">库存预警管理</ui:define>
+    <ui:define name="breadCrumbText">库存预警管理</ui:define>
+
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="menuCode" value="#{stockMaintainView.menuCode}"/>
+            <f:viewAction action="#{stockMaintainView.loadData}" onPostback="false"/>
+        </f:metadata>
+    </ui:define>
+
+    <ui:define name="mainContentContainer">
+        <p:growl id="alertAmountMsg" showDetail="true"/>
+        <h:panelGrid id="searchProdCriteria" columns="11">
+            <h:outputLabel for="prodType" value="产品类型:"/>
+            <p:selectOneMenu id="prodType" value="#{stockMaintainView.stockSearchCriteria.prodCategoryCode}"  style="width: 120px;">
+                <f:selectItem itemLabel="所有产品类型" itemValue=""/>
+                <f:selectItems value="#{stockMaintainView.prodCategoryList}" var="category"
+                               itemLabel="#{category.categoryName}" itemValue="#{category.categoryName}"/>
+            </p:selectOneMenu>
+
+            <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+            <h:outputLabel for="stockType" value="库存类型: "/>
+            <p:selectOneMenu id="stockType" value="#{stockMaintainView.stockSearchCriteria.stockType}"  style="width: 80px;">
+                <f:selectItem itemLabel="所有" itemValue="-1"/>
+                <f:selectItem itemLabel="半成品" itemValue="0"/>
+                <f:selectItem itemLabel="成品" itemValue="1"/>
+            </p:selectOneMenu>
+
+            <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+            <h:outputLabel for="alertStockAmount" value="预警量: "/>
+            <p:inputText id="alertStockAmount" value="#{stockMaintainView.stockSearchCriteria.alertStockAmount}" style="width: 80px;">
+                <o:validator validatorId="javax.faces.LongRange" for="alertStockAmount"
+                             minimum="1" message="比较数量必须大于0"/>
+                <!--<p:ajax update="stockAmount" event="blur" />-->
+                <p:clientValidator />
+            </p:inputText>
+
+            <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+            <p:commandButton id="btn_searchProdInfo" value="设置" process="searchProdCriteria" update=":form:alertAmountMsg" action="#{stockMaintainView.updateStockAlertAmount}">
+            </p:commandButton>
+        </h:panelGrid>
+    </ui:define>
 </ui:composition>

@@ -9,7 +9,7 @@
     <class>com.ims.domain.order.ProformaInvoiceItem</class>
     <class>com.ims.domain.order.PurchaseOrder</class>
     <class>com.ims.domain.order.PurchaseOrderItem</class>
-    <class>com.ims.domain.order.ShipmentProformaInvoice</class>
+    <class>com.ims.domain.order.ProformaInvoice</class>
     <class>com.ims.domain.stock.ProductStockInfo</class>
     <class>com.ims.domain.support.ProductCategory</class>
     <class>com.ims.domain.support.ProductInfo</class>

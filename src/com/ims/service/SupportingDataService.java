@@ -22,18 +22,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Transactional
 @Service("supportingDataService")
-public class SupportingDataService {
-    public static final String MENU_CODE_PROD_CATEGORY = "prodC";
+public class SupportingDataService extends BaseService {
+    public static final String MENU_CODE_PROD_CATEGORY_UNIT = "prodCU";
     public static final String MENU_CODE_PROD_UNIT = "prodU";
     public static final String MENU_CODE_PROD_INFO = "prodI";
     @Autowired
@@ -99,19 +97,47 @@ public class SupportingDataService {
     }
 
 
+    /**
+     * 期望的SQL: select * from ims_product_info where CATEGORY_CODE='xxx' and PRODUCT_CODE like '%yyy%' and (CUST_PROD_CODE like '%aaa%' or CUST_PROD_SECOND_CODE like '%aaa%')
+     * 有两种方式达到效果，如下
+     *
+     * @param prodSearchCriteria
+     * @return
+     */
     public List<ProductInfo> findProductInfoListFrom(final ProdSearchCriteria prodSearchCriteria) {
         Specification<ProductInfo> speci = new Specification<ProductInfo>() {
             @Override
             public Predicate toPredicate(Root<ProductInfo> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<Predicate>();
+                Path<String> custProdCode = root.<String>get(ProductInfo.CUST_PROD_CODE);
+                Path<String> custProdCode2 = root.<String>get(ProductInfo.CUST_SEC_PROD_CODE);
+                Predicate orClause = null;
+
                 if (StringUtils.isNotBlank(prodSearchCriteria.getProdCategoryCode())) {
-                    predicates.add(cb.equal(root.get("categoryCode"), prodSearchCriteria.getProdCategoryCode()));
+                    predicates.add(cb.equal(root.get(ProductInfo.CATEGORY_CODE), prodSearchCriteria.getProdCategoryCode()));
                 }
                 if (StringUtils.isNotEmpty(prodSearchCriteria.getProdCode())) {
-                    predicates.add(cb.equal(root.get("productCode"), prodSearchCriteria.getProdCode()));
+                    predicates.add(cb.like(root.<String>get(ProductInfo.PRODUCT_CODE), getLikeString(prodSearchCriteria.getProdCode())));
                 }
+                if (StringUtils.isNotBlank(prodSearchCriteria.getCustProdCode())) {
+                    //第一种方式，把or直接加入到predicates中，然后在where里面直接 query.where(cb.and(predicates.toArray(new Predicate[predicates.size()])));
+                    //Predicate p1 = cb.or(cb.like(custProdCode, getLikeString(prodSearchCriteria.getCustProdCode())), cb.like(custProdCode2, getLikeString(prodSearchCriteria.getCustProdCode())));
+                    //predicates.add(p1);
 
-                query.where(cb.and(predicates.toArray(new Predicate[predicates.size()])));
+                    //第二种方式：构造一个or的Predicate，然后在where里面和前面的分开组合：query.where(cb.and(predicates.toArray(new Predicate[predicates.size()])),orClause);
+                    String param = getLikeString(prodSearchCriteria.getCustProdCode());
+                    orClause = cb.or(cb.like(custProdCode, param), cb.like(custProdCode2, param));
+                }
+                //select * from ims_product_info  where CATEGORY_CODE=? and (PRODUCT_CODE like ?) and (CUST_PROD_CODE like ? or CUST_PROD_SECOND_CODE like ?)
+                //第一种方式
+                //query.where(cb.and(predicates.toArray(new Predicate[predicates.size()])));
+
+                //第二种方式
+                if (orClause != null) {
+                    query.where(cb.and(predicates.toArray(new Predicate[predicates.size()])), orClause);
+                } else {
+                    query.where(cb.and(predicates.toArray(new Predicate[predicates.size()])));
+                }
                 return null;
             }
         };
@@ -159,11 +185,19 @@ public class SupportingDataService {
                     productStockInfo.updateFromProd(productInfo);
                     updatedProductStockInfos.add(productStockInfo);
                 } else {
-                    newProductStockInfos.add(ProductStockInfo.buildStockInfoFromProd(productInfo,stockType));
+                    newProductStockInfos.add(ProductStockInfo.buildStockInfoFromProd(productInfo, stockType));
                 }
             }
             this.productStockInfoService.saveProductStockInfo(newProductStockInfos);
             this.productStockInfoService.saveProductStockInfo(updatedProductStockInfos);
         }
+    }
+
+    public Map<String, ProductInfo> getProductInfoMap(){
+        Map<String,ProductInfo> productInfoMap = new LinkedHashMap<String, ProductInfo>();
+        for(ProductInfo productInfo:productInfoRepository.findAll()){
+            productInfoMap.put(productInfo.getProductCode(),productInfo);
+        }
+        return productInfoMap;
     }
 }

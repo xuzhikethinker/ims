@@ -8,6 +8,7 @@ package com.ims.service;
 
 import com.ims.domain.stock.ProductStockInfo;
 import com.ims.domain.stock.StockType;
+import com.ims.domain.support.ProductAmount;
 import com.ims.repository.ProductStockInfoRepository;
 import com.ims.webapp.view.criteria.CompareCode;
 import com.ims.webapp.view.criteria.ProdStockSearchCriteria;
@@ -18,11 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.util.*;
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service("productStockInfoService")
 public class ProductStockInfoService {
@@ -35,32 +36,39 @@ public class ProductStockInfoService {
         this.productStockInfoRepository.saveAndFlush(productStockInfo);
     }
 
-    public void updateProdcutStockInfo(ProductStockInfoDTO stockInfoDTO) {
+    public void updateProdcutStockInfo(ProductStockInfoDTO stockInfoDTO, boolean convertToFinishedProd) {
         ProductStockInfo targetStock = stockInfoDTO.getTargetProductStock();
+        ProductStockInfo relatedStock = stockInfoDTO.getRelatedProductStock();
         if (stockInfoDTO.getTargetStockType() == StockType.Finished.getCode()) {
-            ProductStockInfo relatedStock = stockInfoDTO.getRelatedProductStock();
             updateStockAmount(targetStock, stockInfoDTO.getNewStockAmount(), true);
             updateStockAmount(relatedStock, stockInfoDTO.getNewStockAmount(), false);
             this.saveProductStockInfo(relatedStock);
         } else {
+            if(convertToFinishedProd){
+                updateStockAmount(targetStock, stockInfoDTO.getNewStockAmount(), false);
+                updateStockAmount(relatedStock, stockInfoDTO.getNewStockAmount(), true);
+                this.saveProductStockInfo(relatedStock);
+            }else{
             updateStockAmount(targetStock, stockInfoDTO.getNewStockAmount(), true);
+            }
         }
         this.saveProductStockInfo(targetStock);
     }
 
     private void updateStockAmount(ProductStockInfo stockInfo, ProductStockAmountDTO newStockAmount, boolean addStock) {
-        stockInfo.setStockAmount(addStock ? stockInfo.getStockAmount() + newStockAmount.getStockAmount() : stockInfo.getStockAmount() - newStockAmount.getStockAmount());
-        stockInfo.setSize10Amount(addStock ? stockInfo.getSize10Amount() + newStockAmount.getSize10Amount() : stockInfo.getSize10Amount() - newStockAmount.getSize10Amount());
-        stockInfo.setSize9Amount(addStock ? stockInfo.getSize9Amount() + newStockAmount.getSize9Amount() : stockInfo.getSize9Amount() - newStockAmount.getSize9Amount());
-        stockInfo.setSize8Amount(addStock ? stockInfo.getSize8Amount() + newStockAmount.getSize8Amount() : stockInfo.getSize8Amount() - newStockAmount.getSize8Amount());
-        stockInfo.setSize7Amount(addStock ? stockInfo.getSize7Amount() + newStockAmount.getSize7Amount() : stockInfo.getSize7Amount() - newStockAmount.getSize7Amount());
-        stockInfo.setSize6Amount(addStock ? stockInfo.getSize6Amount() + newStockAmount.getSize6Amount() : stockInfo.getSize6Amount() - newStockAmount.getSize6Amount());
-        stockInfo.setSize5Amount(addStock ? stockInfo.getSize5Amount() + newStockAmount.getSize5Amount() : stockInfo.getSize5Amount() - newStockAmount.getSize5Amount());
-        stockInfo.setSize4Amount(addStock ? stockInfo.getSize4Amount() + newStockAmount.getSize4Amount() : stockInfo.getSize4Amount() - newStockAmount.getSize4Amount());
+        ProductAmount productAmount = stockInfo.getProductAmount();
+        productAmount.setTotalAmount(addStock ? productAmount.getTotalAmount() + newStockAmount.getStockAmount() : productAmount.getTotalAmount() - newStockAmount.getStockAmount());
+        productAmount.setSize10Amount(addStock ? productAmount.getSize10Amount() + newStockAmount.getSize10Amount() : productAmount.getSize10Amount() - newStockAmount.getSize10Amount());
+        productAmount.setSize9Amount(addStock ? productAmount.getSize9Amount() + newStockAmount.getSize9Amount() : productAmount.getSize9Amount() - newStockAmount.getSize9Amount());
+        productAmount.setSize8Amount(addStock ? productAmount.getSize8Amount() + newStockAmount.getSize8Amount() : productAmount.getSize8Amount() - newStockAmount.getSize8Amount());
+        productAmount.setSize7Amount(addStock ? productAmount.getSize7Amount() + newStockAmount.getSize7Amount() : productAmount.getSize7Amount() - newStockAmount.getSize7Amount());
+        productAmount.setSize6Amount(addStock ? productAmount.getSize6Amount() + newStockAmount.getSize6Amount() : productAmount.getSize6Amount() - newStockAmount.getSize6Amount());
+        productAmount.setSize5Amount(addStock ? productAmount.getSize5Amount() + newStockAmount.getSize5Amount() : productAmount.getSize5Amount() - newStockAmount.getSize5Amount());
+        productAmount.setSize4Amount(addStock ? productAmount.getSize4Amount() + newStockAmount.getSize4Amount() : productAmount.getSize4Amount() - newStockAmount.getSize4Amount());
 
         if (stockInfo.isSupportSize()) {
-            int stockAmount = stockInfo.getSize4Amount() + stockInfo.getSize5Amount() + stockInfo.getSize6Amount() + stockInfo.getSize7Amount() + stockInfo.getSize8Amount() + stockInfo.getSize9Amount() + stockInfo.getSize10Amount();
-            stockInfo.setStockAmount(stockAmount);
+            int stockAmount = productAmount.getSize4Amount() + productAmount.getSize5Amount() + productAmount.getSize6Amount() + productAmount.getSize7Amount() + productAmount.getSize8Amount() + productAmount.getSize9Amount() + productAmount.getSize10Amount();
+            productAmount.setTotalAmount(stockAmount);
         }
     }
 
@@ -78,24 +86,31 @@ public class ProductStockInfoService {
                 }
                 String compareCode = stockSearchCriteria.getCompareCode();
                 if (StringUtils.isNotEmpty(compareCode) && stockSearchCriteria.isIncludeComparedValue()) {
+                    Path<ProductAmount> productAmount = root.<ProductAmount>get("productAmount");
                     if (CompareCode.isEqual(compareCode)) {
-                        predicates.add(cb.equal(root.get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                        predicates.add(cb.equal(productAmount.get("totalAmount"), stockSearchCriteria.getStockAmount()));
                     } else if (CompareCode.isGreater(compareCode)) {
-                        predicates.add(cb.greaterThan(root.<Integer>get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                        predicates.add(cb.greaterThan(productAmount.<Integer>get("totalAmount"), stockSearchCriteria.getStockAmount()));
                     } else if (CompareCode.isLess(compareCode)) {
-                        predicates.add(cb.lessThan(root.<Integer>get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                        predicates.add(cb.lessThan(productAmount.<Integer>get("totalAmount"), stockSearchCriteria.getStockAmount()));
                     } else if (CompareCode.isGreaterOrEqual(compareCode)) {
-                        predicates.add(cb.greaterThanOrEqualTo(root.<Integer>get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                        predicates.add(cb.greaterThanOrEqualTo(productAmount.<Integer>get("totalAmount"), stockSearchCriteria.getStockAmount()));
                     } else if (CompareCode.isLessOrEqual(compareCode)) {
-                        predicates.add(cb.lessThanOrEqualTo(root.<Integer>get("stockAmount"), stockSearchCriteria.getStockAmount()));
+                        predicates.add(cb.lessThanOrEqualTo(productAmount.<Integer>get("totalAmount"), stockSearchCriteria.getStockAmount()));
+                    } else if(CompareCode.isEqualAlertAmount(compareCode)){
+                        predicates.add(cb.equal(productAmount.get("totalAmount"), root.get("alertStockAmount")));
+                    } else if(CompareCode.isGreaterThanAlertAmount(compareCode)){
+                        predicates.add(cb.greaterThan(productAmount.<String>get("totalAmount"), root.<String>get("alertStockAmount")));
+                    } else if(CompareCode.isLessThanAlertAmount(compareCode)){
+                        predicates.add(cb.lessThan(productAmount.<String>get("totalAmount"), root.<String>get("alertStockAmount")));
                     }
 
                     if (stockSearchCriteria.isTransformAction() && ((CompareCode.isLess(compareCode) || CompareCode.isLessOrEqual(compareCode)))) {
-                        predicates.add(cb.greaterThan(root.<Integer>get("stockAmount"), 0));
+                        predicates.add(cb.greaterThan(productAmount.<Integer>get("totalAmount"), 0));
                     }
                 }
 
-                query.where(cb.and(predicates.toArray(new Predicate[predicates.size()]))).orderBy(cb.desc(root.get("categoryCode")));
+                query.where(cb.and(predicates.toArray(new Predicate[predicates.size()]))).orderBy(cb.desc(root.get("categoryCode")),cb.asc(root.get("productCode")));
                 return null;
             }
         };
@@ -122,27 +137,52 @@ public class ProductStockInfoService {
         for (ProductStockInfoDTO stock : stockInfoDTOList) {
             ProductStockInfo semiStock = stock.getTargetProductStock();
             ProductStockInfo endStock = stock.getRelatedProductStock();
+            ProductAmount endStockAmount = endStock.getProductAmount();
+            ProductAmount semiStockAmount = semiStock.getProductAmount();
 
-            endStock.setStockAmount(endStock.getStockAmount() + semiStock.getStockAmount());
-            endStock.setSize4Amount(endStock.getSize4Amount() + semiStock.getSize4Amount());
-            endStock.setSize5Amount(endStock.getSize5Amount() + semiStock.getSize5Amount());
-            endStock.setSize6Amount(endStock.getSize6Amount() + semiStock.getSize6Amount());
-            endStock.setSize7Amount(endStock.getSize7Amount() + semiStock.getSize7Amount());
-            endStock.setSize8Amount(endStock.getSize8Amount() + semiStock.getSize8Amount());
-            endStock.setSize9Amount(endStock.getSize9Amount() + semiStock.getSize9Amount());
-            endStock.setSize10Amount(endStock.getSize10Amount() + semiStock.getSize10Amount());
+            endStockAmount.setTotalAmount(endStockAmount.getTotalAmount() + semiStock.getStockAmount());
+            endStockAmount.setSize4Amount(endStockAmount.getSize4Amount() + semiStockAmount.getSize4Amount());
+            endStockAmount.setSize5Amount(endStockAmount.getSize5Amount() + semiStockAmount.getSize5Amount());
+            endStockAmount.setSize6Amount(endStockAmount.getSize6Amount() + semiStockAmount.getSize6Amount());
+            endStockAmount.setSize7Amount(endStockAmount.getSize7Amount() + semiStockAmount.getSize7Amount());
+            endStockAmount.setSize8Amount(endStockAmount.getSize8Amount() + semiStockAmount.getSize8Amount());
+            endStockAmount.setSize9Amount(endStockAmount.getSize9Amount() + semiStockAmount.getSize9Amount());
+            endStockAmount.setSize10Amount(endStockAmount.getSize10Amount() + semiStockAmount.getSize10Amount());
 
-            semiStock.setStockAmount(0);
-            semiStock.setSize4Amount(0);
-            semiStock.setSize5Amount(0);
-            semiStock.setSize6Amount(0);
-            semiStock.setSize7Amount(0);
-            semiStock.setSize8Amount(0);
-            semiStock.setSize9Amount(0);
-            semiStock.setSize10Amount(0);
+            semiStockAmount.setTotalAmount(0);
+            semiStockAmount.setSize4Amount(0);
+            semiStockAmount.setSize5Amount(0);
+            semiStockAmount.setSize6Amount(0);
+            semiStockAmount.setSize7Amount(0);
+            semiStockAmount.setSize8Amount(0);
+            semiStockAmount.setSize9Amount(0);
+            semiStockAmount.setSize10Amount(0);
             this.saveProductStockInfo(semiStock);
             this.saveProductStockInfo(endStock);
         }
         return 0;
     }
+
+    public int updateStockAlertAmount(ProdStockSearchCriteria stockSearchCriteria){
+        int updatedRecords = 0;
+        if(StringUtils.isEmpty(stockSearchCriteria.getProdCategoryCode())){
+            if(stockSearchCriteria.getStockType()==ProdStockSearchCriteria.NO_STOCK_TYPE){
+                updatedRecords = productStockInfoRepository.updateStockAlertAmount(stockSearchCriteria.getAlertStockAmount());
+            }else{
+                updatedRecords = productStockInfoRepository.updateStockAlertAmount(stockSearchCriteria.getStockType(),stockSearchCriteria.getAlertStockAmount());
+            }
+        }else{
+            if(stockSearchCriteria.getStockType()==ProdStockSearchCriteria.NO_STOCK_TYPE){
+                updatedRecords = productStockInfoRepository.updateStockAlertAmount(stockSearchCriteria.getProdCategoryCode(),stockSearchCriteria.getAlertStockAmount());
+            }else{
+                updatedRecords = productStockInfoRepository.updateStockAlertAmount(stockSearchCriteria.getProdCategoryCode(),stockSearchCriteria.getStockType(),stockSearchCriteria.getAlertStockAmount());
+            }
+        }
+        return updatedRecords;
+    }
+
+    public List<ProductStockInfo> getAlertedStockInfoList(int stockType){
+        return this.productStockInfoRepository.getLessThanAlertStockAmount(stockType);
+    }
+
 }

@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <p:dialog header="选择产品项" widgetVar="poItemDialog" resizable="false" id="poProdItemDialog"
+              modal="true" style="font-size: 12px;">
+        <p:growl id="stockConvertMsg" showDetail="false"/>
+        <h:panelGrid id="searchProdStockCriteria" columns="15">
+            <h:outputLabel for="prodType" value="产品类型:"/>
+            <p:selectOneMenu id="prodType" value="#{orderMaintainView.prodSearchCriteria.prodCategoryCode}"
+                             style="width: 120px;">
+                <f:selectItem itemLabel="所有产品类型" itemValue=""/>
+                <f:selectItems value="#{orderMaintainView.prodCategoryList}" var="category"
+                               itemLabel="#{category.categoryName}" itemValue="#{category.categoryName}"/>
+                <p:ajax update="productsTable" listener="#{orderMaintainView.filterProductInfoList}"
+                        process="searchProdStockCriteria"/>
+            </p:selectOneMenu>
+
+            <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+            <h:outputLabel for="prodCode" value="产品代号: "/>
+            <p:inputText id="prodCode" value="#{orderMaintainView.stockSearchCriteria.prodCode}" style="width: 120px;"/>
+
+            <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+            <p:commandButton id="btn_searchProdInfo" value="查找" process="searchProdStockCriteria"
+                             action="#{orderMaintainView.filterProductInfoList}">
+            </p:commandButton>
+        </h:panelGrid>
+
+        <p:outputPanel id="productInfo">
+            <p:dataTable id="productsTable" value="#{orderMaintainView.productInfoDataModel}" var="product"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                         selection="#{orderMaintainView.selectedProductInfos}">
+                <p:column selectionMode="multiple"/>
+                <p:column styleClass="table_header">
+                    <f:facet name="header">
+                        <h:outputText value="产品代码"/>
+                    </f:facet>
+                    <h:outputText value="#{product.productCode}"/>
+                </p:column>
+
+                <p:column styleClass="table_header">
+                    <f:facet name="header">
+                        <h:outputText value="产品类别"/>
+                    </f:facet>
+                    <h:outputText value="#{product.categoryCode}"/>
+                </p:column>
+
+                <p:column styleClass="table_header">
+                    <f:facet name="header">
+                        <h:outputText value="产品价格"/>
+                    </f:facet>
+                    <h:outputText value="#{product.price}"/>
+                </p:column>
+
+            </p:dataTable>
+        </p:outputPanel>
+        <p:commandButton id="btn_add_items" value="确定" validateClient="true" ajax="true"
+                         process="poProdItemDialog" update=":form:simplePOInput:poItemList"
+                         action="#{orderMaintainView.populateSelectedProdItems}" oncomplete="if (args &amp;&amp; !args.validationFailed) poItemDialog.hide()" >
+        </p:commandButton>
+
+    </p:dialog>
+</ui:composition>

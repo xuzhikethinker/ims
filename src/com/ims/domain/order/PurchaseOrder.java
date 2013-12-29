@@ -23,8 +23,12 @@ public class PurchaseOrder extends OrderGeneralInfo {
     @Column(name = "PO_STATUS")
     private String status;
 
+
+    @Column(name = "DRAFT_PI_NUM")
+    private String piNumber;
+
     @OneToMany(fetch = FetchType.LAZY)
-    private Set<ShipmentProformaInvoice> associatedProformaInvoices = new HashSet<ShipmentProformaInvoice>();
+    private Set<ProformaInvoice> associatedProformaInvoices = new HashSet<ProformaInvoice>();
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<PurchaseOrderItem> orderItems = new HashSet<PurchaseOrderItem>();
@@ -45,11 +49,11 @@ public class PurchaseOrder extends OrderGeneralInfo {
         this.status = status;
     }
 
-    public Set<ShipmentProformaInvoice> getAssociatedProformaInvoices() {
+    public Set<ProformaInvoice> getAssociatedProformaInvoices() {
         return associatedProformaInvoices;
     }
 
-    public void setAssociatedProformaInvoices(Set<ShipmentProformaInvoice> associatedProformaInvoices) {
+    public void setAssociatedProformaInvoices(Set<ProformaInvoice> associatedProformaInvoices) {
         this.associatedProformaInvoices = associatedProformaInvoices;
     }
 
@@ -61,4 +65,16 @@ public class PurchaseOrder extends OrderGeneralInfo {
         this.orderItems = orderItems;
     }
 
+    public String getPiNumber() {
+        return piNumber;
+    }
+
+    public void setPiNumber(String piNumber) {
+        this.piNumber = piNumber;
+    }
+
+    public void addOrderItemToList(PurchaseOrderItem item){
+        item.setOwner(this);
+        orderItems.add(item);
+    }
 }

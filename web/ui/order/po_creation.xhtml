@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="siteTitle">库存管理系统-PO管理</ui:define>
+    <ui:define name="breadCrumbText">创建PO</ui:define>
+
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="menuCode" value="#{fileUploadController.menuCode}"/>
+            <f:viewAction action="#{orderMaintainView.loadData}" onPostback="false"/>
+        </f:metadata>
+    </ui:define>
+
+    <ui:define name="mainContentContainer">
+
+        <p:panel header="上传Excel PO" id="createPO">
+            请先点击<u><a href="#{request.contextPath}/resources/download/PO-template.xlsx" target="_self "
+                      style="color: blue;"> 这里 </a></u>下载PO模板，完成后上传即可创建一个新的PO
+            <br/>
+
+
+            <p:fileUpload fileUploadListener="#{fileUploadController.processFileUpload}" mode="advanced"
+                          dragDropSupport="yes" process="createPO"
+                          sizeLimit="1000000" allowTypes="/(\.|\/)(xls|xlsx)$/" update=":form"
+                          label="选择文件" uploadLabel="上传" cancelLabel="取消" >
+                <f:attribute name="fileType" value="POInfo"/>
+            </p:fileUpload>
+
+            <p:messages autoUpdate="true"  id="customerMessage"  showDetail="true" showSummary="false"/>
+            <h:outputText  rendered="#{!fileUploadController.processSuccess}" value="#{fileUploadController.errorMessage}"></h:outputText>
+        </p:panel>
+
+        <!--<p:outputPanel id="poMaintainPanel" style="margin-left: 5px; width: 98%;">-->
+            <!--<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">-->
+                <!--<h:outputText value="PO创建方式: "/>-->
+                <!--<p:selectOneRadio id="poMethods" value="#{orderMaintainView.poInputMethod}" layout="grid" columns="1">-->
+                    <!--<f:selectItem itemLabel="简单录入PO - 如果产品数目少于10个，选用此方式直接录入" itemValue="simple"/>-->
+                    <!--<f:selectItem itemLabel="excel上传PO - 如果产品数目多于10个，可选用此方式上传excel" itemValue="excel"/>-->
+                <!--</p:selectOneRadio>-->
+            <!--</h:panelGrid>-->
+
+
+        <!--</p:outputPanel>-->
+        <!--<ui:include src="item_selection.xhtml"></ui:include>-->
+    </ui:define>
+</ui:composition>

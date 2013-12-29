@@ -3,11 +3,10 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
     <div class="sidebar-nav">
-        <p class="nav-header" data-toggle="collapse" style="color:blue;"><i class="icon-dashboard"></i><h:link outcome="/index.xhtml"><span>仪表盘</span></h:link></p>
+        <p class="nav-header" data-toggle="collapse" style="color:blue;"><i class="icon-dashboard"></i><h:link outcome="/index.xhtml?menuCode=semiStock&amp;action=list"><span>仪表盘</span></h:link></p>
         <p class="nav-header" data-toggle="collapse" style="color:blue;"><i class="icon-dashboard"></i>基础数据管理</p>
         <ul id="dashboard-menu" class="nav nav-list collapse in">
-            <li><h:link outcome="/ui/product_unit.xhtml?menuCode=prodU&amp;action=list"><span>产品单位</span></h:link></li>
-            <li><h:link outcome="/ui/product_category.xhtml?menuCode=prodC&amp;action=list"><span>产品类别</span></h:link></li>
+            <li><h:link outcome="/ui/prod_category_unit_maintain.xhtml?menuCode=prodCU&amp;action=list"><span>产品单位和类别维护</span></h:link></li>
             <li><h:link outcome="/ui/product_info.xhtml?menuCode=prodI&amp;action=list"><span>产品信息</span></h:link></li>
             
         </ul>
@@ -17,14 +16,15 @@
         <p class="nav-header collapsed" data-toggle="collapse" style="color:blue;"><i class="icon-exclamation-sign"></i>产品库存管理</p>
         <ul id="error-menu" class="nav nav-list collapse in">
             <li><h:link outcome="/ui/semi_prod_stock.xhtml?menuCode=semiStock&amp;action=list"><span>半成品库存管理</span></h:link></li>
-            <li><h:link outcome="/ui/semi_prod_stock.xhtml?menuCode=semiStock&amp;action=list"><span>半成品-->成品批量转换</span></h:link></li>
+            <li><h:link outcome="/ui/stock_transform.xhtml?menuCode=semiStock&amp;action=list"><span>半成品-->成品批量转换</span></h:link></li>
             <li><h:link outcome="/ui/end_prod_stock.xhtml?menuCode=endStock&amp;action=list"><span>成品库存管理</span></h:link></li>
-            <li><h:link outcome="/ui/prod_stock_alert.xhtml"><span>预警设置</span></h:link></li>
+            <li><h:link outcome="/ui/prod_stock_alert.xhtml?menuCode=endStock&amp;action=list"><span>预警设置</span></h:link></li>
         </ul>
 
         <p class="nav-header collapsed" data-toggle="collapse" style="color:blue;"><i class="icon-legal"></i>订单管理</p>
         <ul id="legal-menu" class="nav nav-list collapse in">
-            <li><h:link outcome="/ui/purchase_order.xhtml"><span>PO管理</span></h:link></li>
+            <li><h:link outcome="/ui/order/po_creation.xhtml"><span>创建PO</span></h:link></li>
+            <li><h:link outcome="/ui/order/po_search.xhtml"><span>查找PO</span></h:link></li>
             <li><h:link outcome="/ui/profoma_invoice.xhtml"><span>PI管理</span></h:link></li>
         </ul>		
 

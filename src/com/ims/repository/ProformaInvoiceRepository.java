@@ -5,12 +5,12 @@
  */
 package com.ims.repository;
 
-import com.ims.domain.order.ShipmentProformaInvoice;
+import com.ims.domain.order.ProformaInvoice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author Administrator
  */
-public interface ProformaInvoiceRepository extends JpaRepository<ShipmentProformaInvoice, Long> {
+public interface ProformaInvoiceRepository extends JpaRepository<ProformaInvoice, Long> {
 
 }

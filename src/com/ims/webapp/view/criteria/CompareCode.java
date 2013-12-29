@@ -11,7 +11,10 @@ public enum CompareCode {
     GREATER(">","大于(>)", "greater than"),
     LESS("<","小于(<)","less than"),
     GREATER_ET(">=","大于等于(>=)","greater than or equal to"),
-    LESS_ET("<=","小于等于(<=)","less than or equal to");
+    LESS_ET("<=","小于等于(<=)","less than or equal to"),
+    ET_ALERT("=A","等于预警量","less than or equal to"),
+    LESS_ALERT("<A","小于预警量","less than or equal to"),
+    GREATER_ALERT(">A","大于预警量","less than or equal to");
 
     private String code;
     private String displayName;
@@ -44,6 +47,18 @@ public enum CompareCode {
 
     public static boolean isLessOrEqual(String code){
         return StringUtils.isNotEmpty(code) && LESS_ET.code.equalsIgnoreCase(code);
+    }
+
+    public static boolean isEqualAlertAmount(String code){
+        return StringUtils.isNotEmpty(code) && ET_ALERT.code.equalsIgnoreCase(code);
+    }
+
+    public static boolean isLessThanAlertAmount(String code){
+        return StringUtils.isNotEmpty(code) && LESS_ALERT.code.equalsIgnoreCase(code);
+    }
+
+    public static boolean isGreaterThanAlertAmount(String code){
+        return StringUtils.isNotEmpty(code) && GREATER_ALERT.code.equalsIgnoreCase(code);
     }
 
     public String getCode() {

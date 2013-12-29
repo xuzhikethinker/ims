@@ -34,7 +34,7 @@
     <p:selectOneMenu id="compareCode" value="#{stockMaintainView.stockSearchCriteria.compareCode}"
                      style="width: 120px;">
         <f:selectItem itemLabel="选择比较符" itemValue=""/>
-        <f:selectItems value="#{stockMaintainView.stockSearchCriteria.compareCodeList}" var="compare"
+        <f:selectItems value="#{stockMaintainView.stockSearchCriteria.compareCodeWithoutAlertList}" var="compare"
                        itemLabel="#{compare.displayName}" itemValue="#{compare.code}"/>
         <p:ajax update="searchProdStockCriteria" listener="#{stockMaintainView.enableCompareValueInput}"
                 process="searchProdStockCriteria"/>

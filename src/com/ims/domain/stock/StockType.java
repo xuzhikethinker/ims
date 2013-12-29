@@ -9,7 +9,6 @@ package com.ims.domain.stock;
  * @author Administrator
  */
 public enum StockType {
-
     Semifinished(0, "Semifinished product"),
     Finished(1, "Finished product");
 

@@ -25,7 +25,7 @@ public class ProformaInvoiceItem extends OrderItem {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "PI_ID")
-    private ShipmentProformaInvoice owner;
+    private ProformaInvoice owner;
 
     public String getPoItemCode() {
         return poItemCode;
@@ -51,11 +51,11 @@ public class ProformaInvoiceItem extends OrderItem {
         this.piNumber = piNumber;
     }
 
-    public ShipmentProformaInvoice getOwner() {
+    public ProformaInvoice getOwner() {
         return owner;
     }
 
-    public void setOwner(ShipmentProformaInvoice owner) {
+    public void setOwner(ProformaInvoice owner) {
         this.owner = owner;
     }
 

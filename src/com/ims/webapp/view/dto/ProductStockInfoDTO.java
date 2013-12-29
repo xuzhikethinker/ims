@@ -7,12 +7,21 @@ import com.ims.domain.stock.ProductStockInfo;
  */
 public class ProductStockInfoDTO {
     private int targetStockType = 0;
+    private String productCode;
     private ProductStockInfo targetProductStock =new ProductStockInfo();
     private ProductStockInfo relatedProductStock=new ProductStockInfo();
     private ProductStockAmountDTO newStockAmount = new ProductStockAmountDTO();
 
     public ProductStockInfoDTO(int targetStockType) {
         this.targetStockType = targetStockType;
+    }
+
+    public String getProductCode() {
+        return productCode;
+    }
+
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
     }
 
     public void resetNewStockAmount(){

@@ -6,6 +6,7 @@
 package com.ims.domain.support;
 
 import com.ims.domain.PersistenceDomain;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 
@@ -17,6 +18,8 @@ import javax.persistence.*;
 public class ProductInfo extends PersistenceDomain {
     public static final String PRODUCT_CODE = "productCode";
     public static final String CATEGORY_CODE = "categoryCode";
+    public static final String CUST_PROD_CODE = "custProdCode";
+    public static final String CUST_SEC_PROD_CODE = "custProdSecondCode";
     public static final String CATEGORY_EARRING = "Earring";
     @Column(name = "PRODUCT_NAME")
     private String productName;
@@ -39,6 +42,15 @@ public class ProductInfo extends PersistenceDomain {
 
     @Column(name = "PRODUCT_PICTURE")
     private String pictureName;
+
+    @Column(name = "PRODUCT_DESC")
+    private String description;
+
+    @Column(name = "CUST_PROD_SECOND_CODE")
+    private String custProdSecondCode;
+
+    @Column(name = "CUST_PROD_CODE")
+    private String custProdCode;
 
     public String getProductName() {
         return productName;
@@ -96,4 +108,35 @@ public class ProductInfo extends PersistenceDomain {
         this.categoryCode = categoryCode;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCustProdCode() {
+        return custProdCode;
+    }
+
+    public String getCustomerProductCode(){
+        if(StringUtils.isNotEmpty(custProdCode)){
+            String result = custProdCode+(StringUtils.isNotEmpty(custProdSecondCode)? "\r\n("+custProdSecondCode+")":"");
+            return result;
+        }
+        return "";
+    }
+
+    public void setCustProdCode(String custProdCode) {
+        this.custProdCode = custProdCode;
+    }
+
+    public String getCustProdSecondCode() {
+        return custProdSecondCode;
+    }
+
+    public void setCustProdSecondCode(String custProdSecondCode) {
+        this.custProdSecondCode = custProdSecondCode;
+    }
 }

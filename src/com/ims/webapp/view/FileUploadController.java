@@ -1,6 +1,13 @@
 package com.ims.webapp.view;
 
+import com.ims.domain.customer.CustomerInfo;
+import com.ims.domain.customer.CustomerProductCodeMap;
+import com.ims.domain.order.OrderStatus;
+import com.ims.domain.order.PurchaseOrder;
+import com.ims.domain.support.ProductInfo;
+import com.ims.webapp.view.util.POInfoFileResolver;
 import com.ims.webapp.view.util.ProductInfoFileResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 
@@ -13,12 +20,102 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @ManagedBean(name = "fileUploadController")
 @ViewScoped
 public class FileUploadController extends BaseView {
+    private static final String PROD_INFO_LIST = "prodInfoList";
+    private static final String PO_INFO_FILE = "POInfo";
+    private String errorMessage = null;
+    private boolean processSuccess = true;
 
     private String fileCode;
+
+    public void processFileUpload(FileUploadEvent event) {
+        String fileType = (String) event.getComponent().getAttributes().get("fileType");
+        UploadedFile file = event.getFile();
+        prodCategoryList = this.supportingDataService.loadProdCategoryList(true);
+        custProdCodeMapList = this.customerService.getCustomerProdCodeMapList();
+        customerProductCodeMapping = this.customerService.getCustomerProdCodeMap();
+        productInfoMap = this.supportingDataService.getProductInfoMap();
+        if (StringUtils.isNotEmpty(fileType) && fileType.equals(PROD_INFO_LIST)) {
+            errorMessage = this.processProdInfoUpload(file);
+            FacesMessage msg = new FacesMessage("上传产品信息", "产品信息上传成功");
+            if (errorMessage != null) {
+                msg = new FacesMessage("上传产品信息", "产品信息上传失败，请查看错误信息");
+                processSuccess = false;
+            }
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        } else if (StringUtils.isNotEmpty(fileType) && fileType.equals(PO_INFO_FILE)) {
+            errorMessage = this.processPOInfoUpload(file, productInfoMap);
+            FacesMessage msg = new FacesMessage("创建草稿PO", "草稿PO创建成功");
+            if (errorMessage != null) {
+                msg = new FacesMessage("创建草稿PO", "草稿PO创建失败，请查看错误信息");
+                processSuccess = false;
+            }
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+
+    }
+
+    private String processPOInfoUpload(UploadedFile file, Map<String, ProductInfo> productInfoMap) {
+        String errorMessage = null;
+        try {
+            PurchaseOrder purchaseOrder = POInfoFileResolver.processPOInfoFile(file.getInputstream(), file.getFileName());
+            if (purchaseOrder != null) {
+                errorMessage = checkUploadedPO(purchaseOrder);
+                if (errorMessage == null) {
+                    CustomerInfo customerInfo = customerService.getCustomerInfo();
+                    purchaseOrder.setCustomerName(customerInfo.getCustomerName());
+                    purchaseOrder.setCustomerCode(customerInfo.getCustomerCode());
+                    purchaseOrder.setContact(customerInfo.getContact());
+                    purchaseOrder.setStatus(OrderStatus.PO_DRAFT.getCode());
+                    this.orderService.savePurchaseOrder(productInfoMap, purchaseOrder);
+                }
+            }
+        } catch (IOException io) {
+            errorMessage = io.getMessage();
+        }
+        return errorMessage;
+    }
+
+    private String checkUploadedPO(PurchaseOrder purchaseOrder) {
+        StringBuffer errors = new StringBuffer();
+
+        if (StringUtils.isNotEmpty(purchaseOrder.getPurchaseOrderNumber())) {
+            List<PurchaseOrder> purchaseOrders = this.orderService.findPurchaseOrderByPONumber(purchaseOrder.getPurchaseOrderNumber());
+            if (purchaseOrders != null && !purchaseOrders.isEmpty()) {
+                errors.append("系统中已有相同的PO No.存在：PO No. = " + purchaseOrder.getPurchaseOrderNumber() + "，修改后重新提交。\r\n");
+            }
+        }
+
+        if (StringUtils.isEmpty(purchaseOrder.getPurchaseOrderNumber())) {
+            errors.append("PO No.不可以为空\r\n");
+        }
+
+        if (purchaseOrder.getOrderItems().isEmpty()) {
+            errors.append("至少要有一条产品记录\r\n");
+        }
+
+        return StringUtils.isEmpty(errors.toString()) ? null : errors.toString();
+    }
+
+    private String processProdInfoUpload(UploadedFile file) {
+        String errorMessage = null;
+        try {
+            List<CustomerProductCodeMap> newCustProdCodeList = new ArrayList<CustomerProductCodeMap>();
+            ProductInfoFileResolver.resolveProductInfoListFile(file.getInputstream(), file.getFileName(), prodCategoryList, customerProductCodeMapping, newCustProdCodeList);
+            this.supportingDataService.updateCategoryList(prodCategoryList);
+            this.productList = this.supportingDataService.getProductInfoList(null);
+        } catch (IOException io) {
+            errorMessage = io.getMessage();
+        }
+        return errorMessage;
+    }
+
 
     public void handleFileUpload(FileUploadEvent event) {
         FacesMessage msg = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
@@ -33,7 +130,7 @@ public class FileUploadController extends BaseView {
                 UploadedFile file = event.getFile();
                 prodCategoryList = this.supportingDataService.loadProdCategoryList(true);
                 if (fileType.equals("prodInfoList")) {
-                    ProductInfoFileResolver.resolveProductInfoListFile(file.getInputstream(), file.getFileName(), prodCategoryList);
+//                    ProductInfoFileResolver.resolveProductInfoListFile(file.getInputstream(), file.getFileName(), prodCategoryList);
                     this.supportingDataService.updateCategoryList(prodCategoryList);
                     this.productList = this.supportingDataService.getProductInfoList(null);
                     return;
@@ -65,5 +162,21 @@ public class FileUploadController extends BaseView {
 
     public void setFileCode(String fileCode) {
         this.fileCode = fileCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public boolean isProcessSuccess() {
+        return processSuccess;
+    }
+
+    public void setProcessSuccess(boolean processSuccess) {
+        this.processSuccess = processSuccess;
     }
 }

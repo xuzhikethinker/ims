@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="siteTitle">库存管理系统-PO管理</ui:define>
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="purchaseOrderID" value="#{orderMaintainView.purchaseOrderID}"/>
+            <f:viewAction action="#{orderMaintainView.loadPO}" onPostback="false"/>
+        </f:metadata>
+    </ui:define>
+    <ui:define name="breadCrumbText">PO维护</ui:define>
+    <ui:define name="mainContentContainer">
+        <p:tabView id="simplePOInput" style="margin-left: 5px;">
+            <p:tab id="basicInfo" title="PO基本信息">
+                <p:panelGrid id="basic" columns="2" style="width: 100%;">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel for="to" value="To:"/>
+                        <p:inputText id="to" value="International Inc" style="width: 350px;"/>
+
+                        <h:outputLabel for="tel" value="Tel:"/>
+                        <p:inputText id="tel" value="1-954-577-8888" style="width: 350px;"/>
+
+                        <h:outputLabel for="fax" value="Fax:"/>
+                        <p:inputText id="fax" value="1-954-577-8988" style="width: 350px;"/>
+
+                        <h:outputLabel for="attn" value="Attn:"/>
+                        <p:inputText id="attn" value="Claudia" style="width: 350px;"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <h:outputLabel for="Issuer" value="Issuer:"/>
+                        <p:inputText id="Issuer" value="Eshine jewelry Co., Ltd." style="width: 350px;"/>
+
+                        <h:outputLabel for="piNum" value="PI NO.:"/>
+                        <p:inputText id="piNum" value="#3745L-Lamar" style="width: 350px;"/>
+
+                        <h:outputLabel for="date" value="Date:"/>
+                        <p:inputText id="date" value="Oct.24.2013" style="width: 350px;"/>
+                    </h:panelGrid>
+                </p:panelGrid>
+                <br/>
+                <p:panelGrid columns="2" style="width: 100%;">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel for="add" value="Add:"/>
+                        <p:inputText id="add" value="International Inc" style="width: 350px;"/>
+
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <h:outputLabel for="poNum" value="Customer PO No.:"/>
+                        <p:inputText id="poNum" value="#3745L-Lamar" style="width: 350px;"/>
+
+                        <h:outputLabel for="deliveryDate" value="Delivery date.:"/>
+                        <p:inputText id="deliveryDate" value="Stock items" style="width: 350px;"/>
+
+                        <h:outputLabel for="shipTo" value="Ship to:"/>
+                        <p:inputText id="shipTo" value="Lamar" style="width: 350px;"/>
+
+                        <h:outputLabel for="tp" value=""/>
+                        <p:inputText id="tp" value="Lamar" style="width: 350px;"/>
+                    </h:panelGrid>
+                </p:panelGrid>
+            </p:tab>
+            <p:tab id="POItemListTab" title="PO产品项">
+                <p:commandLink id="addItem" style="margin-right:20px;" process="@this"
+                               oncomplete="PF('poItemDialog').show()">
+                    <h:outputText value="添加产品项"/>
+                </p:commandLink>
+
+                <p:dataTable id="poItemList" value="#{orderMaintainView.poItemList}" var="product"
+                             paginator="true" rows="10"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
+                    <h:inputHidden value="#{orderMaintainView.searchProd}"/>
+                    <p:column styleClass="table_header">
+                        <f:facet name="header">
+                            <h:outputText value="产品代码"/>
+                        </f:facet>
+                        <h:outputText value="#{product.productCode}"/>
+                    </p:column>
+
+                    <p:column styleClass="table_header">
+                        <f:facet name="header">
+                            <h:outputText value="产品类别"/>
+                        </f:facet>
+                        <h:outputText value="#{product.categoryCode}"/>
+                    </p:column>
+
+                    <p:column styleClass="table_header">
+                        <f:facet name="header">
+                            <h:outputText value="产品价格"/>
+                        </f:facet>
+                        <h:outputText value="#{product.price}"/>
+                    </p:column>
+
+                    <p:column styleClass="table_header">
+                        <f:facet name="header">
+                            <h:outputText value="产品图片"/>
+                        </f:facet>
+                        <p:graphicImage
+                                value="/resources/upload/#{product.pictureName}"/>
+                    </p:column>
+
+                    <p:column styleClass="table_header">
+                        <f:facet name="header">
+                            <h:outputText value="操作"/>
+                        </f:facet>
+                    </p:column>
+
+                </p:dataTable>
+            </p:tab>
+        </p:tabView>
+    </ui:define>
+</ui:composition>

@@ -2,7 +2,8 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                 template="/WEB-INF/template/layoutWithoutForm.xhtml">
 
     <ui:define name="siteTitle">库存管理系统-产品信息</ui:define>
@@ -15,12 +16,13 @@
 
     <ui:define name="breadCrumbText">产品信息</ui:define>
     <ui:define name="mainContentContainer">
-        <p:tabView id="tabView" style="margin-left: 5px;">
-            <p:tab id="tab1" title="产品列表1">
-                <h:form prependId="false" id="form1">
-                    <h:panelGrid id="searchProdCriteria" columns="7">
+        <p:tabView id="prodInfoView" style="margin-left: 5px;">
+            <p:tab id="prodInfoListTab" title="产品列表">
+                <h:form prependId="false" id="prodInfoListForm">
+
+                    <h:panelGrid id="searchProdCriteria" columns="10">
                         <h:outputLabel for="prodType" value="产品类型:"/>
-                        <p:selectOneMenu id="prodType" value="#{supportDataMaintainView.prodSearchCriteria.prodCategoryCode}">
+                        <p:selectOneMenu id="prodType" value="#{supportDataMaintainView.prodSearchCriteria.prodCategoryCode}"  style="width: 120px;">
                             <f:selectItem itemLabel="所有产品类型" itemValue=""/>
                             <f:selectItems value="#{supportDataMaintainView.prodCategoryList}" var="category"
                                            itemLabel="#{category.categoryName}" itemValue="#{category.categoryName}"/>
@@ -29,7 +31,11 @@
 
                         <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
                         <h:outputLabel for="prodCode" value="产品代号: "/>
-                        <p:inputText id="prodCode" value="#{supportDataMaintainView.prodSearchCriteria.prodCode}"/>
+                        <p:inputText id="prodCode" value="#{supportDataMaintainView.prodSearchCriteria.prodCode}"  style="width: 120px;"/>
+
+                        <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+                        <h:outputLabel for="custProdCode" value="客户产品代号: "/>
+                        <p:inputText id="custProdCode" value="#{supportDataMaintainView.prodSearchCriteria.custProdCode}"  style="width: 120px;"/>
 
                         <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
                         <p:commandButton id="btn_searchProdInfo" value="查找" process="searchProdCriteria" update="productsTable" action="#{supportDataMaintainView.searchProdInfo}">
@@ -37,65 +43,109 @@
                     </h:panelGrid>
                     <br/>
                     <p:outputPanel id="productInfo">
+                        <p:messages autoUpdate="true"  id="prodInfoListMessage"  />
                         <p:dataTable id="productsTable" value="#{supportDataMaintainView.productList}" var="product"
                                      paginator="true" rows="10"
-                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "  editable="true">
+                            <p:ajax event="rowEdit" listener="#{supportDataMaintainView.updateProductInfo}" update=":prodInfoView:prodInfoListForm:prodInfoListMessage"/>
+                            <p:ajax event="rowEditCancel" listener="#{stockMaintainView.cancelUpdateProductInfo}" update=":prodInfoView:prodInfoListForm:prodInfoListMessage"/>
+
+                            <p:columnGroup type="header">
+                                <p:row>
+                                    <p:column headerText="产品代码" styleClass="table_header" style="width:12%"/>
+                                    <p:column headerText="产品类别" styleClass="table_header" style="width:8%"/>
+                                    <p:column headerText="客户产品编号" styleClass="table_header" style="width:12%"/>
+                                    <p:column headerText="产品说明" styleClass="table_header" style="width:22%"/>
+                                    <p:column headerText="产品价格" styleClass="table_header" style="width:8%"/>
+                                    <p:column headerText="产品图片" styleClass="table_header" style="width:20%"/>
+                                    <p:column headerText="更新" styleClass="table_header"  style="width:5%"/>
+                                    <p:column headerText="刪除" styleClass="table_header"  style="width:5%"/>
+                                </p:row>
+                            </p:columnGroup>
 
                             <p:column styleClass="table_header">
-                                <f:facet name="header">
-                                    <h:outputText value="产品代码"/>
-                                </f:facet>
                                 <h:outputText value="#{product.productCode}"/>
                             </p:column>
 
                             <p:column styleClass="table_header">
-                                <f:facet name="header">
-                                    <h:outputText value="产品类别"/>
-                                </f:facet>
                                 <h:outputText value="#{product.categoryCode}"/>
                             </p:column>
 
                             <p:column styleClass="table_header">
-                                <f:facet name="header">
-                                    <h:outputText value="产品价格"/>
-                                </f:facet>
-                                <h:outputText value="#{product.price}"/>
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{product.custProdCode}"/>
+                                        <h:outputText value="(#{product.custProdSecondCode})" rendered="#{not empty product.custProdSecondCode}"></h:outputText>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{product.custProdCode}" style="width:80%"/><br/>
+                                        (<h:inputText value="#{product.custProdSecondCode}" style="width:80%"></h:inputText>)
+                                    </f:facet>
+                                </p:cellEditor>
                             </p:column>
 
                             <p:column styleClass="table_header">
-                                <f:facet name="header">
-                                    <h:outputText value="产品图片"/>
-                                </f:facet>
-                                <p:graphicImage
-                                        value="/resources/upload/#{product.pictureName}"/>
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{product.description}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{product.description}" style="width:80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
                             </p:column>
 
                             <p:column styleClass="table_header">
-                                <f:facet name="header">
-                                    <h:outputText value="操作"/>
-                                </f:facet>
-                                <p:commandLink style="margin-right:20px;" update=":tabView:form1" ajax="true" process="@this"
-                                               oncomplete="PF('productDialog').show()">
-                                    <h:outputText value="编辑"/>
-                                    <f:setPropertyActionListener value="edit" target="#{supportDataMaintainView.action}"/>
-                                    <f:setPropertyActionListener value="#{product}"
-                                                                 target="#{supportDataMaintainView.selectedProductInfo}"/>
-                                </p:commandLink>
-
-                                <p:commandLink id="delete" style="margin-right:20px;"
-                                               action="#{supportDataMaintainView.deleteProductInfo}" process="@this"
-                                               update=":tabView:form1"
-                                               immediate="true">
-                                    <h:outputText value="删除"/>
-                                    <f:setPropertyActionListener value="#{product}"
-                                                                 target="#{supportDataMaintainView.selectedProductInfo}"/>
-                                    <f:setPropertyActionListener value="delete" target="#{supportDataMaintainView.action}"/>
-                                </p:commandLink>
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{product.price}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{product.price}" style="width:80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
                             </p:column>
 
+                            <p:column styleClass="table_header">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <p:graphicImage
+                                                value="/resources/upload/#{product.pictureName}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{product.pictureName}" style="width:80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+
+                            </p:column>
+
+                            <p:column styleClass="table_header">
+                                <p:rowEditor></p:rowEditor>
+                                <!--<p:commandLink style="margin-right:20px;" update=":tabView:form1" ajax="true" process="@this"-->
+                                               <!--oncomplete="PF('productDialog').show()">-->
+                                    <!--<h:outputText value="编辑"/>-->
+                                    <!--<f:setPropertyActionListener value="edit" target="#{supportDataMaintainView.action}"/>-->
+                                    <!--<f:setPropertyActionListener value="#{product}"-->
+                                                                 <!--target="#{supportDataMaintainView.selectedProductInfo}"/>-->
+                                <!--</p:commandLink>-->
+
+                                <!--<p:commandLink id="delete" style="margin-right:20px;"-->
+                                               <!--action="#{supportDataMaintainView.deleteProductInfo}" process="@this"-->
+                                               <!--update=":tabView:form1"-->
+                                               <!--immediate="true">-->
+                                    <!--<h:outputText value="删除"/>-->
+                                    <!--<f:setPropertyActionListener value="#{product}"-->
+                                                                 <!--target="#{supportDataMaintainView.selectedProductInfo}"/>-->
+                                    <!--<f:setPropertyActionListener value="delete" target="#{supportDataMaintainView.action}"/>-->
+                                <!--</p:commandLink>-->
+                            </p:column>
+
+                            <p:column styleClass="table_header">
+                                删除
+                            </p:column>
                         </p:dataTable>
                     </p:outputPanel>
-                    <ui:include src="widget/prod_info_edit.xhtml"></ui:include>
+                    <!--<ui:include src="widget/prod_info_edit.xhtml"></ui:include>-->
                 </h:form>
             </p:tab>
             <p:tab id="tab2" title="新增产品">
@@ -118,7 +168,7 @@
                             <h:inputText value="#{supportDataMaintainView.newProductInfo.price}"/>
 
                             <p:commandButton id="btn_add" value="保存"
-                                             update=":tabView:form2" validateClient="true" ajax="true" process="addSingleProdInfo"
+                                             update=":prodInfoView:form2" validateClient="true" ajax="true" process="addSingleProdInfo"
                                              action="#{supportDataMaintainView.addProductInfo}">
                                 <f:setPropertyActionListener value="list" target="#{supportDataMaintainView.action}"/>
                             </p:commandButton>
@@ -128,12 +178,12 @@
                     </p:panel>
                     <br/>
                     <p:panel header="批量上传产品" id="addMultipleProdInfo">
-                        请先点击<u><a href="#{request.contextPath}/resources/download/productInfo.xlsx" target="_self "
+                        请先点击<u><a href="#{request.contextPath}/resources/download/ProductCodeList-template.xlsx" target="_self "
                                   style="color: blue;"> 这里 </a></u>下载产品信息模板
                         <br/>
 
 
-                        <p:fileUpload fileUploadListener="#{fileUploadController.handleFileUpload}" mode="advanced"
+                        <p:fileUpload fileUploadListener="#{fileUploadController.processFileUpload}" mode="advanced"
                                       dragDropSupport="false" process="addMultipleProdInfo"
                                       sizeLimit="1000000" allowTypes="/(\.|\/)(gif|jpe?g|png|xls|xlsx)$/" update="@this"
                                       label="选择文件" uploadLabel="上传" cancelLabel="取消">

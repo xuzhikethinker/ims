@@ -10,7 +10,7 @@ import com.ims.domain.support.ProductCategory;
 import com.ims.domain.support.ProductInfo;
 import com.ims.domain.support.ProductUnit;
 import com.ims.service.SupportingDataService;
-import com.ims.webapp.view.criteria.ProdSearchCriteria;
+import org.primefaces.event.RowEditEvent;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -28,7 +28,7 @@ public class SupportDataMaintainView extends BaseView {
     private String selectedProdCategory;
     private ProductInfo selectedProductInfo;
     private ProductInfo newProductInfo = new ProductInfo();
-    private ProdSearchCriteria prodSearchCriteria = new ProdSearchCriteria();
+
 
     //    @PostConstruct
 //    public void init(){
@@ -39,7 +39,7 @@ public class SupportDataMaintainView extends BaseView {
     }
 
     public void loadData() {
-        if (SupportingDataService.MENU_CODE_PROD_CATEGORY.equalsIgnoreCase(getMenuCode())) {
+        if (SupportingDataService.MENU_CODE_PROD_CATEGORY_UNIT.equalsIgnoreCase(getMenuCode())) {
             prodCategoryList = this.supportingDataService.loadProdCategoryList(false);
             productCategoryMap = this.buildProductCategoryMap(prodCategoryList);
             this.productUnitList = this.supportingDataService.loadProdProdUnitList();
@@ -60,49 +60,86 @@ public class SupportDataMaintainView extends BaseView {
 
     public String addNewProductCategory() {
         this.supportingDataService.addNewProductCategory(productCategory);
-        reloadData(SupportingDataService.MENU_CODE_PROD_CATEGORY);
+        reloadData(SupportingDataService.MENU_CODE_PROD_CATEGORY_UNIT);
         return null;
     }
 
-    public String updateProductInfo() {
+    public String updateProductInfo1() {
         this.supportingDataService.updateProductInfo(selectedProductInfo);
         return null;
     }
 
+    public void updateProductInfo(RowEditEvent event) {
+        selectedProductInfo = (ProductInfo) event.getObject();
+        FacesMessage msg = new FacesMessage("更新产品信息", "产品信息成功更新");
+        this.supportingDataService.updateProductInfo(selectedProductInfo);
+        reloadData(SupportingDataService.MENU_CODE_PROD_INFO);
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+
+    public void cancelUpdateProductInfo(RowEditEvent event) {
+        FacesMessage msg = new FacesMessage("更新产品信息", "产品信息更新已被取消");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+
     public void saveProductUnit(ActionEvent actionEvent) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("已经成功添加"));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("成功添加产品单位"));
         supportingDataService.addNewProductUnit(productUnit);
-        reloadData(SupportingDataService.MENU_CODE_PROD_UNIT);
+        reloadData(SupportingDataService.MENU_CODE_PROD_CATEGORY_UNIT);
+    }
+
+    public void editProdCategory(RowEditEvent event) {
+        productCategory = (ProductCategory) event.getObject();
+        FacesMessage msg = new FacesMessage("更新产品类别", "产品类别成功更新");
+        this.supportingDataService.addNewProductCategory(productCategory);
+        reloadData(SupportingDataService.MENU_CODE_PROD_CATEGORY_UNIT);
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+
+    public void editProdUnit(RowEditEvent event) {
+        ProductUnit unit = (ProductUnit) event.getObject();
+        FacesMessage msg = new FacesMessage("更新产品单元", unit + " 产品单元成功更新");
+        supportingDataService.addNewProductUnit(unit);
+        reloadData(SupportingDataService.MENU_CODE_PROD_CATEGORY_UNIT);
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+
+    public void cancelUpdateUnit(RowEditEvent event) {
+        FacesMessage msg = new FacesMessage("产品单位更新", "产品单位更新已被取消");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+
+    public void cancelUpdateCategory(RowEditEvent event) {
+        FacesMessage msg = new FacesMessage("产品类别更新", "产品类别更新已被取消");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
     public void saveProductCategory(ActionEvent actionEvent) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("成功新增产品目录"));
         supportingDataService.addNewProductCategory(productCategory);
-        reloadData(SupportingDataService.MENU_CODE_PROD_CATEGORY);
+        reloadData(SupportingDataService.MENU_CODE_PROD_CATEGORY_UNIT);
     }
 
 
     public ProductUnit getProductUnit() {
-        System.out.println("------ getProductUnit=" + productUnit);
         return productUnit;
     }
 
     public void setProductUnit(ProductUnit productUnit) {
-        System.out.println("------ setProductUnit=" + productUnit);
         this.productUnit = productUnit;
     }
 
     public String deleteProductUnit() {
-        System.out.println("------ deleteProductUnit=" + productUnit);
         this.supportingDataService.deleteProductUnit(productUnit);
         reloadData(SupportingDataService.MENU_CODE_PROD_UNIT);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("成功删除产品单位"));
         return null;
     }
 
     public String deleteProductCategory() {
-        System.out.println("------ deleteProductCategory=" + productCategory);
         this.supportingDataService.deleteProductCategory(productCategory);
-        reloadData(SupportingDataService.MENU_CODE_PROD_CATEGORY);
+        reloadData(SupportingDataService.MENU_CODE_PROD_CATEGORY_UNIT);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("成功删除产品类别"));
         return null;
     }
 
@@ -142,14 +179,9 @@ public class SupportDataMaintainView extends BaseView {
         this.productCategory = productCategory;
     }
 
-    public void filterProductInfoList() {
-        System.out.println("selectedProdCategory=" + prodSearchCriteria.toString());
-        this.productList = this.supportingDataService.getProductInfoList(prodSearchCriteria);
-    }
 
     public String searchProdInfo() {
         System.out.println("searchCriteria=" + this.prodSearchCriteria.toString());
-//        this.productList = this.supportingDataService.getProductInfoList(prodSearchCriteria);
         this.productList = this.supportingDataService.findProductInfoListFrom(prodSearchCriteria);
         return null;
     }
@@ -183,11 +215,4 @@ public class SupportDataMaintainView extends BaseView {
         this.newProductInfo = newProductInfo;
     }
 
-    public ProdSearchCriteria getProdSearchCriteria() {
-        return prodSearchCriteria;
-    }
-
-    public void setProdSearchCriteria(ProdSearchCriteria prodSearchCriteria) {
-        this.prodSearchCriteria = prodSearchCriteria;
-    }
 }

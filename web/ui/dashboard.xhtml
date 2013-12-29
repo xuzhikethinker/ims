@@ -3,5 +3,159 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
-    首页 = #{homeView.prodCategoryList}
+    <p:panel header="半成品-低于预警量产品列表" style="margin-left: 5px;width: 95%" toggleable="true" toggleSpeed="500" collapsed="true">
+        <p:dataTable id="productSemiStockTable" value="#{stockMaintainView.stockInfoDTOList}" var="product"
+                     paginator="true" rows="10"
+                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
+            <p:columnGroup type="header">
+                <p:row>
+                    <p:column rowspan="2" headerText="产品代码" styleClass="table_header" style="width:10%"/>
+                    <p:column rowspan="2" headerText="产品类别" styleClass="table_header" style="width:10%"/>
+                    <p:column colspan="9" headerText="产品数量" styleClass="table_header"/>
+                </p:row>
+
+                <p:row>
+                    <p:column headerText="#4" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#5" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#6" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#7" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#8" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#9" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#10" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="总数" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="预警数" styleClass="table_header" style="width:7%"/>
+                </p:row>
+            </p:columnGroup>
+
+            <p:column>
+                #{product.targetProductStock.productCode}
+            </p:column>
+
+            <p:column>
+                #{product.targetProductStock.categoryCode}
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.targetProductStock.productAmount.size4Amount}"
+                              rendered="#{product.targetProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.targetProductStock.productAmount.size5Amount}"
+                              rendered="#{product.targetProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.targetProductStock.productAmount.size6Amount}"
+                              rendered="#{product.targetProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.targetProductStock.productAmount.size7Amount}"
+                              rendered="#{product.targetProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.targetProductStock.productAmount.size8Amount}"
+                              rendered="#{product.targetProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.targetProductStock.productAmount.size9Amount}"
+                              rendered="#{product.targetProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.targetProductStock.productAmount.size10Amount}"
+                              rendered="#{product.targetProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.targetProductStock.productAmount.totalAmount}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.targetProductStock.alertStockAmount}"/>
+            </p:column>
+
+        </p:dataTable>
+    </p:panel>
+    <br/>
+    <p:panel header="成品-低于预警量产品列表" style="margin-left: 5px;width: 95%" toggleable="true" toggleSpeed="500" collapsed="true" >
+        <p:dataTable id="productEndStockTable" value="#{stockMaintainView.stockInfoDTOList}" var="product"
+                     paginator="true" rows="10"
+                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
+            <p:columnGroup type="header">
+                <p:row>
+                    <p:column rowspan="2" headerText="产品代码" styleClass="table_header" style="width:10%"/>
+                    <p:column rowspan="2" headerText="产品类别" styleClass="table_header" style="width:10%"/>
+                    <p:column colspan="9" headerText="产品数量" styleClass="table_header"/>
+                </p:row>
+
+                <p:row>
+                    <p:column headerText="#4" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#5" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#6" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#7" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#8" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#9" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="#10" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="总数" styleClass="table_header" style="width:7%"/>
+                    <p:column headerText="预警数" styleClass="table_header" style="width:7%"/>
+                </p:row>
+            </p:columnGroup>
+
+            <p:column>
+                #{product.relatedProductStock.productCode}
+            </p:column>
+
+            <p:column>
+                #{product.relatedProductStock.categoryCode}
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.relatedProductStock.productAmount.size4Amount}"
+                              rendered="#{product.relatedProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.relatedProductStock.productAmount.size5Amount}"
+                              rendered="#{product.relatedProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.relatedProductStock.productAmount.size6Amount}"
+                              rendered="#{product.relatedProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.relatedProductStock.productAmount.size7Amount}"
+                              rendered="#{product.relatedProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.relatedProductStock.productAmount.size8Amount}"
+                              rendered="#{product.relatedProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.relatedProductStock.productAmount.size9Amount}"
+                              rendered="#{product.relatedProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.relatedProductStock.productAmount.size10Amount}"
+                              rendered="#{product.relatedProductStock.supportSize}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.relatedProductStock.productAmount.totalAmount}"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{product.relatedProductStock.alertStockAmount}"/>
+            </p:column>
+
+        </p:dataTable>
+    </p:panel>
 </ui:composition>

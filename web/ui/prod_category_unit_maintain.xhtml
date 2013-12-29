@@ -1,0 +1,216 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template/layoutWithoutForm.xhtml">
+
+    <ui:define name="siteTitle">库存管理系统-产品信息</ui:define>
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="menuCode" value="#{supportDataMaintainView.menuCode}"/>
+            <f:viewAction action="#{supportDataMaintainView.loadData}" onPostback="false"/>
+        </f:metadata>
+    </ui:define>
+
+    <ui:define name="breadCrumbText">产品单位和类别维护</ui:define>
+    <ui:define name="mainContentContainer">
+        <p:tabView id="UnitCategoryView" style="margin-left: 5px;">
+            <p:tab id="prodUnitTab" title="产品单位">
+                <h:form prependId="false" id="prodUnitForm">
+                    <p:messages autoUpdate="false"  id="unitMessage" />
+                    <p:dataTable id="unitsTable" value="#{supportDataMaintainView.productUnitList}" var="unit"
+                                 style="width: 80%; margin-left: 5px;" editable="true">
+                        <p:ajax event="rowEdit" listener="#{supportDataMaintainView.editProdUnit}"  update=":UnitCategoryView:prodUnitForm:unitMessage"/>
+                        <p:ajax event="rowEditCancel" listener="#{supportDataMaintainView.cancelUpdateUnit}" update=":UnitCategoryView:prodUnitForm:unitMessage"/>
+                        <p:columnGroup type="header">
+                            <p:row>
+                                <p:column headerText="单位名称" styleClass="table_header" style="width:30%"/>
+                                <p:column headerText="单位说明" styleClass="table_header" style="width:30%"/>
+                                <p:column headerText="更新" styleClass="table_header"/>
+                                <p:column headerText="刪除" styleClass="table_header"/>
+                            </p:row>
+                        </p:columnGroup>
+
+                        <p:column>
+                            <h:outputText value="#{unit.unitName}"/>
+                        </p:column>
+
+                        <p:column>
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{unit.description}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputText value="#{unit.description}" style="width:80%"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column>
+                            <p:rowEditor></p:rowEditor>
+                        </p:column>
+
+                        <p:column>
+                            <p:commandLink id="delete" style="margin-right:20px;"
+                                           action="#{supportDataMaintainView.deleteProductUnit}" process="@this"
+                                           update=":UnitCategoryView:prodUnitForm"
+                                           immediate="true">
+                                <h:outputText value="删除"/>
+                                <f:setPropertyActionListener value="#{unit}"
+                                                             target="#{supportDataMaintainView.productUnit}"/>
+                                <f:setPropertyActionListener value="delete" target="#{supportDataMaintainView.action}"/>
+                            </p:commandLink>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <br/>
+                    <p:panel id="newUnitPanel" header="创建产品单位" toggleable="true" closable="false" toggleSpeed="500"
+                             closeSpeed="500" widgetVar="unitPanel" collapsed="true">
+                        <h:panelGrid columns="4" id="editUnitSection">
+                            <h:outputLabel value="单位名称 : *" for="unitName"></h:outputLabel>
+                            <p:inputText id="unitName"
+                                         value="#{supportDataMaintainView.productUnit.unitName}" required="true"
+                                         requiredMessage="单位名称不可为空"/>
+                            <p:message for="unitName"/>
+                            <h:outputText value=""/>
+
+                            <h:outputLabel value="单位说明 :" for="unitDesc"></h:outputLabel>
+                            <p:inputText id="unitDesc" required="false"
+                                         value="#{supportDataMaintainView.productUnit.description}"/>
+                            <p:message for="unitDesc"/>
+                            <h:outputText value=""/>
+                        </h:panelGrid>
+                        <p:commandButton id="btn_save" value="保存"
+                                         update=":UnitCategoryView:prodUnitForm" validateClient="true" ajax="true"
+                                         actionListener="#{supportDataMaintainView.saveProductUnit}" >
+                        </p:commandButton>
+                    </p:panel>
+                </h:form>
+            </p:tab>
+            <p:tab id="prodCategoryTab" title="产品类别">
+                <h:form prependId="false" id="prodCategoryForm">
+                    <p:messages autoUpdate="false"  showDetail="true" id="categoryMessage" />
+                    <p:outputPanel id="categoryPanel" style="width: 80%; margin-left: 5px;">
+                        <p:dataTable id="categoryTable" value="#{supportDataMaintainView.prodCategoryList}"
+                                     var="category"  editable="true">
+                            <p:ajax event="rowEdit" listener="#{supportDataMaintainView.editProdCategory}"  update=":UnitCategoryView:prodUnitForm:unitMessage"/>
+                            <p:ajax event="rowEditCancel" listener="#{supportDataMaintainView.cancelUpdateUnit}" update=":UnitCategoryView:prodUnitForm:unitMessage"/>
+                            <p:columnGroup type="header">
+                                <p:row>
+                                    <p:column headerText="产品类别名称" styleClass="table_header" style="width:20%"/>
+                                    <p:column headerText="类别单位" styleClass="table_header" style="width:20%"/>
+                                    <p:column headerText="英文说明" styleClass="table_header" style="width:20%"/>
+                                    <p:column headerText="中文说明" styleClass="table_header" style="width:20%"/>
+                                    <p:column headerText="更新" styleClass="table_header"  style="width:10%"/>
+                                    <p:column headerText="刪除" styleClass="table_header"  style="width:10%"/>
+                                </p:row>
+                            </p:columnGroup>
+
+                            <p:column styleClass="table_header">
+                                <h:outputText value="#{category.categoryName}"/>
+                            </p:column>
+
+                            <p:column styleClass="table_header">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{category.unit}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:selectOneRadio id="categoryUnit" value="#{category.unit}"
+                                                          layout="grid" columns="2" required="true" requiredMessage="产品类别单位不可为空">
+                                            <f:selectItems value="#{supportDataMaintainView.productUnitList}" var="unit"
+                                                           itemLabel="#{unit.unitName}" itemValue="#{unit.unitName}"/>
+                                        </p:selectOneRadio>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column styleClass="table_header">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{category.englishDesc}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{category.englishDesc}" style="width:80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column styleClass="table_header">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{category.chineseDesc}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{category.chineseDesc}" style="width:80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column>
+                                <p:rowEditor></p:rowEditor>
+                            </p:column>
+
+                            <p:column>
+                                <p:commandLink id="deleteCategory" style="margin-right:20px;"
+                                               action="#{supportDataMaintainView.deleteProductCategory}" process="@this"
+                                               update=":UnitCategoryView:prodCategoryForm"
+                                               immediate="true">
+                                    <h:outputText value="删除"/>
+                                    <f:setPropertyActionListener value="#{category}"
+                                                                 target="#{supportDataMaintainView.productCategory}"/>
+                                    <f:setPropertyActionListener value="delete" target="#{supportDataMaintainView.action}"/>
+                                </p:commandLink>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:outputPanel>
+
+                    <br/>
+
+                    <p:panel id="newCategoryPanel" header="创建产品类别" toggleable="true" closable="false" toggleSpeed="500"
+                             closeSpeed="500" widgetVar="CategoryPanel" collapsed="true" >
+                        <h:panelGrid columns="4" id="categoryEditSection">
+                            <h:outputLabel value="产品类别名称 : *" for="categoryName"></h:outputLabel>
+                            <p:inputText id="categoryName"
+                                         value="#{supportDataMaintainView.productCategory.categoryName}" required="true"
+                                         requiredMessage="产品类别名称不可为空"/>
+                            <p:message for="categoryName"/>
+                            <h:outputText value=""/>
+
+                            <h:outputLabel value="产品类别单位 : *" for="catUnit"></h:outputLabel>
+                            <p:selectOneRadio id="catUnit" value="#{supportDataMaintainView.productCategory.unit}"
+                                              layout="grid" columns="2" required="true" requiredMessage="产品类别单位不可为空">
+                                <f:selectItems value="#{supportDataMaintainView.productUnitList}" var="unit"
+                                               itemLabel="#{unit.unitName}" itemValue="#{unit.unitName}"/>
+                            </p:selectOneRadio>
+                            <p:message for="catUnit"/>
+                            <h:outputText value=""/>
+
+                            <h:outputLabel value="类别英文说明 :" for="categoryENDesc"></h:outputLabel>
+                            <p:inputText id="categoryENDesc" required="false"
+                                         value="#{supportDataMaintainView.productCategory.englishDesc}"/>
+                            <p:message for="categoryENDesc"/>
+                            <h:outputText value=""/>
+
+                            <h:outputLabel value="类别中文说明 :" for="categoryCNDesc"></h:outputLabel>
+                            <p:inputText id="categoryCNDesc" required="false"
+                                         value="#{supportDataMaintainView.productCategory.chineseDesc}"/>
+                            <p:message for="categoryCNDesc"/>
+                            <h:outputText value=""/>
+                        </h:panelGrid>
+                        <p:commandButton id="btn_edit" value="保存"
+                                         update=":UnitCategoryView:prodCategoryForm :UnitCategoryView:prodCategoryForm:newCategoryPanel" validateClient="true" ajax="true"
+                                         action="#{supportDataMaintainView.addNewProductCategory}">
+                            <f:setPropertyActionListener value="list" target="#{supportDataMaintainView.action}"/>
+                        </p:commandButton>
+                    </p:panel>
+                </h:form>
+            </p:tab>
+        </p:tabView>
+
+
+    </ui:define>
+</ui:composition>
