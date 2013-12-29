@@ -88,7 +88,7 @@ public class ShipmentProformaInvoice extends OrderGeneralInfo {
     }
 
     public void addOrderItem(ProformaInvoiceItem newItem) {
-        newItem.setOwner(this);
+       // newItem.setOwner(this);
         this.orderItems.add(newItem);
         this.getChangeLog().setLastModifiedDate(new Date());
     }
