@@ -91,7 +91,6 @@ public class OrderMaintainView extends StockMaintainView {
     }
 
     public String populateSelectedProdItems() {
-        System.out.println("selectedProductInfos=" + selectedProductInfos);
         if (selectedProductInfos != null) {
             if (!searchProd) {
                 poItemList = new ArrayList<ProductInfo>();
@@ -148,10 +147,24 @@ public class OrderMaintainView extends StockMaintainView {
         this.orderSearchCriteria = orderSearchCriteria;
     }
 
-    public List<OrderStatusDTO> getOrderStatus(){
+    public List<OrderStatusDTO> getPurchaseOrderStatus(){
         List<OrderStatusDTO> orderStatusDTOs = new ArrayList<OrderStatusDTO>();
         for(OrderStatus status:OrderStatus.values()){
+            if(status.isPoStatus()){
+                OrderStatusDTO statusDTO = new OrderStatusDTO(status.getCode(),status.getDescription());
+                orderStatusDTOs.add(statusDTO);
+            }
+        }
+        return orderStatusDTOs;
+    }
 
+    public List<OrderStatusDTO> getProformaInvoiceStatus(){
+        List<OrderStatusDTO> orderStatusDTOs = new ArrayList<OrderStatusDTO>();
+        for(OrderStatus status:OrderStatus.values()){
+            if(!status.isPoStatus()){
+                OrderStatusDTO statusDTO = new OrderStatusDTO(status.getCode(),status.getDescription());
+                orderStatusDTOs.add(statusDTO);
+            }
         }
         return orderStatusDTOs;
     }

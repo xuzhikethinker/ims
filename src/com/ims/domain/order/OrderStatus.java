@@ -30,4 +30,12 @@ public enum OrderStatus {
     public String getCode() {
         return code;
     }
+
+    public boolean isPoStatus() {
+        return poStatus;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

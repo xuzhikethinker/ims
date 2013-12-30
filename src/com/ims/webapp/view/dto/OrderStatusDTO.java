@@ -7,6 +7,14 @@ public class OrderStatusDTO {
     private String code;
     private String description;
 
+    public OrderStatusDTO() {
+    }
+
+    public OrderStatusDTO(String code, String description) {
+        this.code = code;
+        this.description = description;
+    }
+
     public String getCode() {
         return code;
     }
