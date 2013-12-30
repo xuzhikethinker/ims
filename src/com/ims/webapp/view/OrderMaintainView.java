@@ -31,6 +31,7 @@ public class OrderMaintainView extends StockMaintainView {
     private boolean searchProd = false;
     private Long purchaseOrderID;
     private OrderSearchCriteria orderSearchCriteria = new OrderSearchCriteria();
+    private List<PurchaseOrder> purchaseOrderList = new ArrayList<PurchaseOrder>();
 
     public void loadData() {
         prodCategoryList = this.supportingDataService.loadProdCategoryList(true);
@@ -119,6 +120,11 @@ public class OrderMaintainView extends StockMaintainView {
         return poItemList;
     }
 
+    public String searchPurchaseOrder(){
+        purchaseOrderList = this.orderService.searchPurchaseOrderList(orderSearchCriteria);
+        return null;
+    }
+
     public void setPoItemList(List<ProductInfo> poItemList) {
         this.poItemList = poItemList;
     }
@@ -167,5 +173,13 @@ public class OrderMaintainView extends StockMaintainView {
             }
         }
         return orderStatusDTOs;
+    }
+
+    public List<PurchaseOrder> getPurchaseOrderList() {
+        return purchaseOrderList;
+    }
+
+    public void setPurchaseOrderList(List<PurchaseOrder> purchaseOrderList) {
+        this.purchaseOrderList = purchaseOrderList;
     }
 }

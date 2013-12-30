@@ -31,7 +31,7 @@
             </p:fileUpload>
 
             <p:messages autoUpdate="true"  id="customerMessage"  showDetail="true" showSummary="false"/>
-            <h:outputText  rendered="#{!fileUploadController.processSuccess}" value="#{fileUploadController.errorMessage}"></h:outputText>
+            <p:outputPanel rendered="#{!fileUploadController.processSuccess}"><pre>#{fileUploadController.errorMessage}</pre></p:outputPanel>
         </p:panel>
 
         <!--<p:outputPanel id="poMaintainPanel" style="margin-left: 5px; width: 98%;">-->

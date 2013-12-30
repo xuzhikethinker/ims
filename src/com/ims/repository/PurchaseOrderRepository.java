@@ -7,6 +7,7 @@ package com.ims.repository;
 
 import com.ims.domain.order.PurchaseOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * @author Administrator
  */
-public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long> {
+public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long>, JpaSpecificationExecutor<PurchaseOrder> {
     @Query("select u from PurchaseOrder u where upper(u.purchaseOrderNumber)=?1")
     public List<PurchaseOrder> findPurchaseOrderByPurchaseOrderNumber(String poNumber);
 }

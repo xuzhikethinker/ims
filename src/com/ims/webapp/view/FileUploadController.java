@@ -4,6 +4,7 @@ import com.ims.domain.customer.CustomerInfo;
 import com.ims.domain.customer.CustomerProductCodeMap;
 import com.ims.domain.order.OrderStatus;
 import com.ims.domain.order.PurchaseOrder;
+import com.ims.domain.order.PurchaseOrderItem;
 import com.ims.domain.support.ProductInfo;
 import com.ims.webapp.view.util.POInfoFileResolver;
 import com.ims.webapp.view.util.ProductInfoFileResolver;
@@ -63,6 +64,11 @@ public class FileUploadController extends BaseView {
 
     private String processPOInfoUpload(UploadedFile file, Map<String, ProductInfo> productInfoMap) {
         String errorMessage = null;
+        StringBuffer errors = new StringBuffer();
+        StringBuilder noProductList = new StringBuilder("系统中没有如下产品：\r\n");
+        boolean noProduct = false;
+        StringBuilder noCustomerProdCodeList = new StringBuilder("系统中如下产品没有对应的客户产品编号：\r\n");
+        boolean noCustProdCode = false;
         try {
             PurchaseOrder purchaseOrder = POInfoFileResolver.processPOInfoFile(file.getInputstream(), file.getFileName());
             if (purchaseOrder != null) {
@@ -73,7 +79,38 @@ public class FileUploadController extends BaseView {
                     purchaseOrder.setCustomerCode(customerInfo.getCustomerCode());
                     purchaseOrder.setContact(customerInfo.getContact());
                     purchaseOrder.setStatus(OrderStatus.PO_DRAFT.getCode());
-                    this.orderService.savePurchaseOrder(productInfoMap, purchaseOrder);
+                    if (!purchaseOrder.getOrderItems().isEmpty()) {
+                        for (PurchaseOrderItem item : purchaseOrder.getOrderItems()) {
+                            ProductInfo productInfo = productInfoMap.get(item.getCompanyProductCode());
+                            if (productInfo != null) {
+                                String custProdCode = productInfo.getCustomerProductCode();
+                                if (custProdCode == null) {
+                                    custProdCode = "No_Customer_Product_Code";
+                                    noCustProdCode = true;
+                                    noCustomerProdCodeList.append("");
+                                }
+
+                                item.setCustomerProductCode(custProdCode);
+                                double unitPrice = item.getUnitPrice() == 0l ? productInfo.getPrice() : item.getUnitPrice();
+                                item.setUnitPrice(unitPrice);
+                                item.setTotalPrice(unitPrice * item.getProductAmount().getTotalAmount());
+                            } else {
+                                noProduct = true;
+                                noProductList.append("Product No. = " + item.getCompanyProductCode() + "\r\n");
+                            }
+                        }
+                    }
+                    if (noProduct) {
+                        errors.append(noProductList.toString() + "\r\n");
+                    }
+
+                    if (noCustProdCode) {
+                        errors.append(noCustomerProdCodeList.toString() + "\r\n");
+                    }
+                    errorMessage = errors.toString();
+                    if (errorMessage == null || errorMessage.length() == 0) {
+                        this.orderService.savePurchaseOrder(productInfoMap, purchaseOrder);
+                    }
                 }
             }
         } catch (IOException io) {

@@ -13,9 +13,17 @@ import com.ims.repository.ProformaInvoiceItemRepository;
 import com.ims.repository.ProformaInvoiceRepository;
 import com.ims.repository.PurchaseOrderItemRepository;
 import com.ims.repository.PurchaseOrderRepository;
+import com.ims.webapp.view.criteria.OrderSearchCriteria;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,21 +46,37 @@ public class OrderService {
 
     public void savePurchaseOrder(Map<String, ProductInfo> productInfoMap, PurchaseOrder purchaseOrder) {
 
-        if (!purchaseOrder.getOrderItems().isEmpty()) {
-            for (PurchaseOrderItem item : purchaseOrder.getOrderItems()) {
-                ProductInfo productInfo = productInfoMap.get(item.getCompanyProductCode());
-                if (productInfo != null) {
-                    item.setCustomerProductCode(productInfo.getCustomerProductCode());
-                    double unitPrice = item.getUnitPrice()==0l? productInfo.getPrice():item.getUnitPrice();
-                    item.setUnitPrice(unitPrice);
-                    item.setTotalPrice(unitPrice*item.getProductAmount().getTotalAmount());
-                }
-            }
-        }
+
         this.purchaseOrderRepository.saveAndFlush(purchaseOrder);
     }
 
     public List<PurchaseOrder> findPurchaseOrderByPONumber(String poNumber){
         return this.purchaseOrderRepository.findPurchaseOrderByPurchaseOrderNumber(poNumber.toUpperCase());
+    }
+
+    public List<PurchaseOrder> searchPurchaseOrderList(final OrderSearchCriteria orderSearchCriteria){
+        List<PurchaseOrder> purchaseOrders = new ArrayList<PurchaseOrder>();
+        Specification<PurchaseOrder> speci = new Specification<PurchaseOrder>() {
+            @Override
+            public Predicate toPredicate(Root<PurchaseOrder> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                List<Predicate> predicates = new ArrayList<Predicate>();
+                if(StringUtils.isNotEmpty(orderSearchCriteria.getPurchaseOrderStatus())){
+                predicates.add(cb.equal(root.get("status"), orderSearchCriteria.getPurchaseOrderStatus()));
+                }
+
+                if (StringUtils.isNotEmpty(orderSearchCriteria.getPurchaseOrderNum())) {
+                    predicates.add(cb.like(root.<String>get("purchaseOrderNumber"), "%" + orderSearchCriteria.getPurchaseOrderNum() + "%"));
+                }
+
+                if (StringUtils.isNotEmpty(orderSearchCriteria.getProformaInvoiceNum())) {
+                    predicates.add(cb.like(root.<String>get("piNumber"), "%" + orderSearchCriteria.getProformaInvoiceNum() + "%"));
+                }
+
+                query.where(cb.and(predicates.toArray(new Predicate[predicates.size()]))).orderBy(cb.desc(root.get("changeLog").get("createdDate")));
+                return null;
+            }
+        };
+
+        return purchaseOrderRepository.findAll(speci);
     }
 }

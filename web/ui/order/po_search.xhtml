@@ -8,26 +8,64 @@
     <ui:define name="siteTitle">库存管理系统-PO管理</ui:define>
     <ui:define name="breadCrumbText">查找PO</ui:define>
     <ui:define name="mainContentContainer">
-        <h:panelGrid id="searchPOCriteria" columns="10">
+        <h:panelGrid id="searchPOCriteria" columns="10"  style="margin-left: 5px;">
             <h:outputLabel for="prodType" value="PO状态:"/>
-            <p:selectOneMenu id="prodType" value="#{orderMaintainView.orderSearchCriteria.purchaseOrderStatus}"  style="width: 120px;">
+            <p:selectOneMenu id="prodType" value="#{orderMaintainView.orderSearchCriteria.purchaseOrderStatus}"
+                             style="width: 200px;">
                 <f:selectItem itemLabel="所有状态" itemValue=""/>
-                <f:selectItems value="#{supportDataMaintainView.prodCategoryList}" var="category"
-                               itemLabel="#{category.categoryName}" itemValue="#{category.categoryName}"/>
-                <p:ajax update="productsTable" listener="#{supportDataMaintainView.filterProductInfoList}" process="searchProdCriteria"/>
+                <f:selectItems value="#{orderMaintainView.purchaseOrderStatus}" var="status"
+                               itemLabel="#{status.description}" itemValue="#{status.code}"/>
             </p:selectOneMenu>
 
             <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
             <h:outputLabel for="poNum" value="PO No.: "/>
-            <p:inputText id="poNum" value="#{orderMaintainView.orderSearchCriteria.purchaseOrderNum}"  style="width: 120px;"/>
+            <p:inputText id="poNum" value="#{orderMaintainView.orderSearchCriteria.purchaseOrderNum}"
+                         style="width: 120px;"/>
 
             <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
             <h:outputLabel for="piNum" value="PI No.: "/>
-            <p:inputText id="piNum" value="#{orderMaintainView.orderSearchCriteria.proformaInvoiceNum}"  style="width: 120px;"/>
+            <p:inputText id="piNum" value="#{orderMaintainView.orderSearchCriteria.proformaInvoiceNum}"
+                         style="width: 120px;"/>
 
             <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
-            <p:commandButton id="btn_searchProdInfo" value="查找" process="searchPOCriteria" update="@this" action="#{supportDataMaintainView.searchProdInfo}">
+            <p:commandButton id="btn_searchProdInfo" value="查找" process="searchPOCriteria" update=":form"
+                             action="#{orderMaintainView.searchPurchaseOrder}">
             </p:commandButton>
         </h:panelGrid>
+        <br/>
+        <p:outputPanel id="POPanel"  style="margin-left: 5px;">
+            <p:dataTable id="posTable" value="#{orderMaintainView.purchaseOrderList}" var="po"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column headerText="PO No." styleClass="table_header" style="width:20%"/>
+                        <p:column headerText="PI No." styleClass="table_header" style="width:20%"/>
+                        <p:column headerText="PO状态" styleClass="table_header" style="width:20%"/>
+                        <p:column headerText="PO总价" styleClass="table_header" style="width:20%"/>
+                        <p:column headerText="操作" styleClass="table_header" style="width:20%"/>
+                    </p:row>
+                </p:columnGroup>
+                <p:column styleClass="table_header">
+                    <h:outputText value="#{po.purchaseOrderNumber}"/>
+                </p:column>
+
+                <p:column styleClass="table_header">
+                    <h:outputText value="#{po.piNumber}"/>
+                </p:column>
+
+                <p:column styleClass="table_header">
+                    <h:outputText value="#{po.status}"/>
+                </p:column>
+
+                <p:column styleClass="table_header">
+                    <h:outputText value="9000"/>
+                </p:column>
+
+                <p:column styleClass="table_header">
+
+                </p:column>
+            </p:dataTable>
+        </p:outputPanel>
     </ui:define>
 </ui:composition>
