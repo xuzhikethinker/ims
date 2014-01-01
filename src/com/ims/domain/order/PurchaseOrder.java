@@ -45,6 +45,10 @@ public class PurchaseOrder extends OrderGeneralInfo {
         return status;
     }
 
+    public String getStatusDisplayString() {
+        return OrderStatus.getDescription(status);
+    }
+
     public void setStatus(String status) {
         this.status = status;
     }
@@ -73,8 +77,12 @@ public class PurchaseOrder extends OrderGeneralInfo {
         this.piNumber = piNumber;
     }
 
-    public void addOrderItemToList(PurchaseOrderItem item){
+    public void addOrderItemToList(PurchaseOrderItem item) {
         item.setOwner(this);
         orderItems.add(item);
+    }
+
+    public void addToTotalPrice(double itemPrice) {
+        this.totalPrice += itemPrice;
     }
 }

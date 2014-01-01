@@ -27,6 +27,14 @@ public enum OrderStatus {
         this.poStatus = poStatus;
     }
 
+    public static String getDescription(String code){
+        for(OrderStatus status:OrderStatus.values()){
+            if(status.getCode().equalsIgnoreCase(code)){
+                return status.getDescription();
+            }
+        }
+        return "";
+    }
     public String getCode() {
         return code;
     }

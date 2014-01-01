@@ -11,7 +11,6 @@ import com.ims.domain.PersistenceDomain;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Temporal;
 
 /**
  * @author Administrator
@@ -20,25 +19,25 @@ import javax.persistence.Temporal;
 public class OrderGeneralInfo extends PersistenceDomain {
 
     @Column(name = "CUSTOMER_NAME")
-    private String customerName;
+    protected String customerName;
 
     @Column(name = "CUSTOMER_CODE")
-    private String customerCode;
+    protected String customerCode;
 
-    @Column(name = "TOTAL_AMOUNT")
-    private double totalAmount;
+    @Column(name = "TOTAL_PRICE")
+    protected double totalPrice;
 
     @Embedded
-    private ContactInfo contact;
+    protected ContactInfo contact;
 
     @Column(name = "PO_REQUIREMENT_REMARKS")
-    private String orderRequirementRemarks;
+    protected String orderRequirementRemarks;
 
     @Column(name = "ORDER_SUBMIT_DATE")
-    private String orderSubmitDate;
+    protected String orderSubmitDate;
 
     @Column(name = "ORDER_DELIVERY_DATE")
-    private String deliveryDate;
+    protected String deliveryDate;
 
     public String getOrderRequirementRemarks() {
         return orderRequirementRemarks;
@@ -88,12 +87,11 @@ public class OrderGeneralInfo extends PersistenceDomain {
         this.contact = contact;
     }
 
-    public double getTotalAmount() {
-        return totalAmount;
+    public double getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
-
 }

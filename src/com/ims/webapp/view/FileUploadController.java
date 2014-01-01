@@ -94,6 +94,7 @@ public class FileUploadController extends BaseView {
                                 double unitPrice = item.getUnitPrice() == 0l ? productInfo.getPrice() : item.getUnitPrice();
                                 item.setUnitPrice(unitPrice);
                                 item.setTotalPrice(unitPrice * item.getProductAmount().getTotalAmount());
+                                purchaseOrder.addToTotalPrice(item.getTotalPrice());
                             } else {
                                 noProduct = true;
                                 noProductList.append("Product No. = " + item.getCompanyProductCode() + "\r\n");
