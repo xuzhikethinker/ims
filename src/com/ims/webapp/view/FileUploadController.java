@@ -108,7 +108,10 @@ public class FileUploadController extends BaseView {
                     if (noCustProdCode) {
                         errors.append(noCustomerProdCodeList.toString() + "\r\n");
                     }
-                    errorMessage = errors.toString();
+                    if(!errors.toString().isEmpty()){
+                        errorMessage = errors.toString();
+                    }
+
                     if (errorMessage == null || errorMessage.length() == 0) {
                         this.orderService.savePurchaseOrder(productInfoMap, purchaseOrder);
                     }

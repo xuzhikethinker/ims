@@ -3,6 +3,7 @@ package com.ims.webapp.view;
 import com.ims.domain.stock.ProductStockInfo;
 import com.ims.domain.stock.StockType;
 import com.ims.domain.support.ProductAmount;
+import com.ims.domain.support.ProductCategory;
 import com.ims.service.ProductStockInfoService;
 import com.ims.webapp.view.criteria.CompareCode;
 import com.ims.webapp.view.criteria.ProdStockSearchCriteria;
@@ -61,11 +62,15 @@ public class StockMaintainView extends BaseView {
 
     private void buildStockInfoDTO(Map<String, ProductStockInfo> semiStockMap, Map<String, ProductStockInfo> endStockMap) {
         boolean semiProdStock = ProductStockInfoService.SEMI_PROD_STOCK.equalsIgnoreCase(getMenuCode());
+        Map<String, ProductCategory> categoryMap = this.supportingDataService.loadProdCategoryMap();
         for (String prodCode : endStockMap.keySet()) {
             ProductStockInfoDTO stockInfoDTO = new ProductStockInfoDTO(semiProdStock ? StockType.Semifinished.getCode() : StockType.Finished.getCode());
             ProductStockInfo targetStock = semiProdStock ? semiStockMap.get(prodCode) : endStockMap.get(prodCode);
             ProductStockInfo relatedStock = semiProdStock ? endStockMap.get(prodCode) : semiStockMap.get(prodCode);
             if (targetStock != null) {
+                ProductCategory category = categoryMap.get(targetStock.getCategoryCode());
+                targetStock.setCategory(category);
+                relatedStock.setCategory(category);
                 stockInfoDTO.setProductCode(prodCode);
                 stockInfoDTO.setTargetProductStock(targetStock);
                 stockInfoDTO.setRelatedProductStock(relatedStock);

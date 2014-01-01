@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui"
                 template="/WEB-INF/template/layout.xhtml">
 
     <ui:define name="siteTitle">库存管理系统-PO管理</ui:define>
@@ -59,11 +60,16 @@
                 </p:column>
 
                 <p:column styleClass="table_header">
-                    <h:outputText value="9000"/>
+                    <h:outputText value="#{po.totalPrice}"/>
                 </p:column>
 
                 <p:column styleClass="table_header">
-
+                    <p:commandLink style="margin-right:20px;" ajax="false" action="#{orderMaintainView.gotoModifyPO}">
+                        <h:outputText value="更新"/>
+                        <f:setPropertyActionListener value="#{po}" target="#{orderMaintainView.purchaseOrder}"/>
+                        <f:setPropertyActionListener value="#{po.id}" target="#{orderMaintainView.purchaseOrderID}"/>
+                    </p:commandLink>
+                    <h:link outcome="po_maintain.xhtml?purchaseOrderID=#{po.id}"><span>更新2</span></h:link>
                 </p:column>
             </p:dataTable>
         </p:outputPanel>

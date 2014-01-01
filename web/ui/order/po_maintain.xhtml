@@ -19,23 +19,29 @@
                 <p:panelGrid id="basic" columns="2" style="width: 100%;">
                     <h:panelGrid columns="2">
                         <h:outputLabel for="to" value="To:"/>
-                        <p:inputText id="to" value="International Inc" style="width: 350px;"/>
+                        <p:inputText id="to" value="#{orderMaintainView.purchaseOrder.customerName}"
+                                     style="width: 350px;"/>
 
                         <h:outputLabel for="tel" value="Tel:"/>
-                        <p:inputText id="tel" value="1-954-577-8888" style="width: 350px;"/>
+                        <p:inputText id="tel" value="#{orderMaintainView.purchaseOrder.contact.phoneNum}"
+                                     style="width: 350px;"/>
 
                         <h:outputLabel for="fax" value="Fax:"/>
-                        <p:inputText id="fax" value="1-954-577-8988" style="width: 350px;"/>
+                        <p:inputText id="fax" value="#{orderMaintainView.purchaseOrder.contact.faxNum}"
+                                     style="width: 350px;"/>
 
                         <h:outputLabel for="attn" value="Attn:"/>
-                        <p:inputText id="attn" value="Claudia" style="width: 350px;"/>
+                        <p:inputText id="attn" value="#{orderMaintainView.purchaseOrder.contact.contactName}"
+                                     style="width: 350px;"/>
                     </h:panelGrid>
                     <h:panelGrid columns="2">
                         <h:outputLabel for="Issuer" value="Issuer:"/>
-                        <p:inputText id="Issuer" value="Eshine jewelry Co., Ltd." style="width: 350px;"/>
+                        <p:inputText id="Issuer" value="#{orderMaintainView.purchaseOrder.customerName}"
+                                     style="width: 350px;"/>
 
                         <h:outputLabel for="piNum" value="PI NO.:"/>
-                        <p:inputText id="piNum" value="#3745L-Lamar" style="width: 350px;"/>
+                        <p:inputText id="piNum" value="#{orderMaintainView.purchaseOrder.piNumber}"
+                                     style="width: 350px;"/>
 
                         <h:outputLabel for="date" value="Date:"/>
                         <p:inputText id="date" value="Oct.24.2013" style="width: 350px;"/>
@@ -50,64 +56,120 @@
                     </h:panelGrid>
                     <h:panelGrid columns="2">
                         <h:outputLabel for="poNum" value="Customer PO No.:"/>
-                        <p:inputText id="poNum" value="#3745L-Lamar" style="width: 350px;"/>
+                        <p:inputText id="poNum" value="#{orderMaintainView.purchaseOrder.purchaseOrderNumber}"
+                                     style="width: 350px;"/>
 
                         <h:outputLabel for="deliveryDate" value="Delivery date.:"/>
-                        <p:inputText id="deliveryDate" value="Stock items" style="width: 350px;"/>
+                        <p:inputText id="deliveryDate" value="#{orderMaintainView.purchaseOrder.deliveryDate}"
+                                     style="width: 350px;"/>
 
                         <h:outputLabel for="shipTo" value="Ship to:"/>
-                        <p:inputText id="shipTo" value="Lamar" style="width: 350px;"/>
+                        <p:inputText id="shipTo" value="" style="width: 350px;"/>
 
                         <h:outputLabel for="tp" value=""/>
-                        <p:inputText id="tp" value="Lamar" style="width: 350px;"/>
+                        <p:inputText id="tp" value="" style="width: 350px;"/>
                     </h:panelGrid>
                 </p:panelGrid>
             </p:tab>
             <p:tab id="POItemListTab" title="PO产品项">
                 <p:commandLink id="addItem" style="margin-right:20px;" process="@this"
                                oncomplete="PF('poItemDialog').show()">
-                    <h:outputText value="添加产品项"/>
+                    <h:outputText value="#{orderMaintainView.purchaseOrder.totalPrice}"/>
                 </p:commandLink>
 
-                <p:dataTable id="poItemList" value="#{orderMaintainView.poItemList}" var="product"
-                             paginator="true" rows="10"
+                <p:dataTable id="poItemList" value="#{orderMaintainView.purchaseOrder.orderItemList}" var="orderItem" paginator="true" rows="10" editable="true"
                              paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
-                    <h:inputHidden value="#{orderMaintainView.searchProd}"/>
+
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column rowspan="2" headerText="产品代码" styleClass="table_header" style="width:10%"/>
+                            <p:column rowspan="2" headerText="产品类别" styleClass="table_header" style="width:10%"/>
+                            <p:column rowspan="2" headerText="产品图片" styleClass="table_header" style="width:10%"/>
+                            <p:column colspan="8" headerText="产品数量" styleClass="table_header"/>
+                            <p:column rowspan="2" headerText="操作" styleClass="table_header"/>
+                        </p:row>
+
+                        <p:row>
+                            <p:column headerText="#4" styleClass="table_header" style="width:7%"/>
+                            <p:column headerText="#5" styleClass="table_header" style="width:7%"/>
+                            <p:column headerText="#6" styleClass="table_header" style="width:7%"/>
+                            <p:column headerText="#7" styleClass="table_header" style="width:7%"/>
+                            <p:column headerText="#8" styleClass="table_header" style="width:7%"/>
+                            <p:column headerText="#9" styleClass="table_header" style="width:7%"/>
+                            <p:column headerText="#10" styleClass="table_header" style="width:7%"/>
+                            <p:column headerText="总数" styleClass="table_header" style="width:7%"/>
+                        </p:row>
+                    </p:columnGroup>
+
+                    <!-- 产品代码 -->
                     <p:column styleClass="table_header">
-                        <f:facet name="header">
-                            <h:outputText value="产品代码"/>
-                        </f:facet>
-                        <h:outputText value="#{product.productCode}"/>
+                        <h:outputText value="#{orderItem.companyProductCode}"/>
                     </p:column>
 
+                    <!-- 产品类别 -->
                     <p:column styleClass="table_header">
-                        <f:facet name="header">
-                            <h:outputText value="产品类别"/>
-                        </f:facet>
-                        <h:outputText value="#{product.categoryCode}"/>
+                        <h:outputText value="#{orderItem.productInfo.categoryCode}"/>
                     </p:column>
 
+                    <!-- 产品图片 -->
                     <p:column styleClass="table_header">
-                        <f:facet name="header">
-                            <h:outputText value="产品价格"/>
-                        </f:facet>
-                        <h:outputText value="#{product.price}"/>
+                        <h:outputText value="#{orderItem.productInfo.pictureName}"/>
                     </p:column>
 
+                    <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <f:facet name="header">
-                            <h:outputText value="产品图片"/>
-                        </f:facet>
-                        <p:graphicImage
-                                value="/resources/upload/#{product.pictureName}"/>
+                        <h:outputText value="#{orderItem.productAmount.size4Amount}"/>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{orderItem.productAmount.size4Amount}}"
+                                              rendered="#{product.targetProductStock.category.supportSize}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{orderItem.productAmount.size4Amount}"
+                                             rendered="#{product.targetProductStock.category.supportSize}" style="width:100%"/>
+                            </f:facet>
+                        </p:cellEditor>
                     </p:column>
 
+                    <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <f:facet name="header">
-                            <h:outputText value="操作"/>
-                        </f:facet>
+                        <h:outputText value="#{orderItem.productAmount.size5Amount}"/>
                     </p:column>
 
+                    <!-- 产品数量-->
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{orderItem.productAmount.size6Amount}"/>
+                    </p:column>
+
+                    <!-- 产品数量-->
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{orderItem.productAmount.size7Amount}"/>
+                    </p:column>
+
+                    <!-- 产品数量-->
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{orderItem.productAmount.size8Amount}"/>
+                    </p:column>
+
+                    <!-- 产品数量-->
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{orderItem.productAmount.size9Amount}"/>
+                    </p:column>
+
+                    <!-- 产品数量-->
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{orderItem.productAmount.size10Amount}"/>
+                    </p:column>
+
+                    <!-- 产品数量-->
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{orderItem.productAmount.totalAmount}"/>
+                    </p:column>
+
+                    <!-- 产品数量-->
+                    <p:column styleClass="table_header">
+                        <p:rowEditor/>
+                    </p:column>
                 </p:dataTable>
             </p:tab>
         </p:tabView>

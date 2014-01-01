@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Transactional
 @Service("supportingDataService")
@@ -54,7 +51,15 @@ public class SupportingDataService extends BaseService {
             }
         }
         return results;
+    }
 
+    public Map<String, ProductCategory> loadProdCategoryMap() {
+        List<ProductCategory> results = productCategoryRepository.findAll();
+        Map<String, ProductCategory> categoryMap = new HashMap<String, ProductCategory>();
+        for (ProductCategory category : results) {
+            categoryMap.put(category.getCategoryName(), category);
+        }
+        return categoryMap;
     }
 
     public List<ProductUnit> loadProdProdUnitList() {
@@ -193,10 +198,10 @@ public class SupportingDataService extends BaseService {
         }
     }
 
-    public Map<String, ProductInfo> getProductInfoMap(){
-        Map<String,ProductInfo> productInfoMap = new LinkedHashMap<String, ProductInfo>();
-        for(ProductInfo productInfo:productInfoRepository.findAll()){
-            productInfoMap.put(productInfo.getProductCode(),productInfo);
+    public Map<String, ProductInfo> getProductInfoMap() {
+        Map<String, ProductInfo> productInfoMap = new LinkedHashMap<String, ProductInfo>();
+        for (ProductInfo productInfo : productInfoRepository.findAll()) {
+            productInfoMap.put(productInfo.getProductCode(), productInfo);
         }
         return productInfoMap;
     }

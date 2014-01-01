@@ -40,7 +40,13 @@ public class OrderMaintainView extends StockMaintainView {
     }
 
     public void loadPO(){
+        this.purchaseOrder = this.orderService.findPurchaseOrderByID(purchaseOrderID);
+        System.out.println("id="+this.purchaseOrderID);
+    }
 
+    public String gotoModifyPO(){
+
+        return "po_maintain";
     }
 
     public String getOrderAction() {

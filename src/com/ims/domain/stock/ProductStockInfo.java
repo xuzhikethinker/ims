@@ -7,12 +7,10 @@ package com.ims.domain.stock;
 
 import com.ims.domain.PersistenceDomain;
 import com.ims.domain.support.ProductAmount;
+import com.ims.domain.support.ProductCategory;
 import com.ims.domain.support.ProductInfo;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "ims_product_stock")
@@ -35,6 +33,9 @@ public class ProductStockInfo extends PersistenceDomain {
 
     @Column(name = "STOCK_ALERT_AMOUNT")
     private int alertStockAmount;
+
+    @Transient
+    private ProductCategory category;
 
     public String getProductCode() {
         return productCode;
@@ -105,5 +106,13 @@ public class ProductStockInfo extends PersistenceDomain {
 
     public void setProductAmount(ProductAmount productAmount) {
         this.productAmount = productAmount;
+    }
+
+    public ProductCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ProductCategory category) {
+        this.category = category;
     }
 }

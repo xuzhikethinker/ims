@@ -92,18 +92,19 @@
             <p:tab id="prodCategoryTab" title="产品类别">
                 <h:form prependId="false" id="prodCategoryForm">
                     <p:messages autoUpdate="false"  showDetail="true" id="categoryMessage" />
-                    <p:outputPanel id="categoryPanel" style="width: 80%; margin-left: 5px;">
+                    <p:outputPanel id="categoryPanel" style="width: 95%; margin-left: 5px;">
                         <p:dataTable id="categoryTable" value="#{supportDataMaintainView.prodCategoryList}"
                                      var="category"  editable="true">
                             <p:ajax event="rowEdit" listener="#{supportDataMaintainView.editProdCategory}"  update=":UnitCategoryView:prodUnitForm:unitMessage"/>
                             <p:ajax event="rowEditCancel" listener="#{supportDataMaintainView.cancelUpdateUnit}" update=":UnitCategoryView:prodUnitForm:unitMessage"/>
                             <p:columnGroup type="header">
                                 <p:row>
-                                    <p:column headerText="产品类别名称" styleClass="table_header" style="width:20%"/>
-                                    <p:column headerText="类别单位" styleClass="table_header" style="width:20%"/>
+                                    <p:column headerText="产品类别名称" styleClass="table_header" style="width:15%"/>
+                                    <p:column headerText="类别单位" styleClass="table_header" style="width:12%"/>
+                                    <p:column headerText="支持多尺寸" styleClass="table_header" style="width:13%"/>
                                     <p:column headerText="英文说明" styleClass="table_header" style="width:20%"/>
                                     <p:column headerText="中文说明" styleClass="table_header" style="width:20%"/>
-                                    <p:column headerText="更新" styleClass="table_header"  style="width:10%"/>
+                                    <p:column headerText="更新" styleClass="table_header"  style="width:8%"/>
                                     <p:column headerText="刪除" styleClass="table_header"  style="width:10%"/>
                                 </p:row>
                             </p:columnGroup>
@@ -122,6 +123,20 @@
                                                           layout="grid" columns="2" required="true" requiredMessage="产品类别单位不可为空">
                                             <f:selectItems value="#{supportDataMaintainView.productUnitList}" var="unit"
                                                            itemLabel="#{unit.unitName}" itemValue="#{unit.unitName}"/>
+                                        </p:selectOneRadio>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column styleClass="table_header">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{category.supportSize?'支持':'不支持'}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:selectOneRadio id="supportSizeCol" value="#{category.supportSize}">
+                                            <f:selectItem itemLabel="支持" itemValue="true" />
+                                            <f:selectItem itemLabel="不支持" itemValue="false" />
                                         </p:selectOneRadio>
                                     </f:facet>
                                 </p:cellEditor>
@@ -187,6 +202,14 @@
                                                itemLabel="#{unit.unitName}" itemValue="#{unit.unitName}"/>
                             </p:selectOneRadio>
                             <p:message for="catUnit"/>
+                            <h:outputText value=""/>
+
+                            <h:outputLabel value="产品支持多尺寸 : *" for="supportSize"></h:outputLabel>
+                            <p:selectOneRadio id="supportSize" value="#{supportDataMaintainView.productCategory.supportSize}">
+                                <f:selectItem itemLabel="支持" itemValue="true" />
+                                <f:selectItem itemLabel="不支持" itemValue="false" />
+                            </p:selectOneRadio>
+                            <p:message for="supportSize"/>
                             <h:outputText value=""/>
 
                             <h:outputLabel value="类别英文说明 :" for="categoryENDesc"></h:outputLabel>

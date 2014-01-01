@@ -16,7 +16,7 @@
         </h:panelGrid>
 
         <h:panelGrid id="stockAmount1" columns="2" cellpadding="4"
-                     rendered="#{!stockMaintainView.selectedProductStock.supportSize}">
+                     rendered="#{!stockMaintainView.selectedProductStock.category.supportSize}">
             <h:outputText value="库存总量:"/>
             <h:outputText id="stockAmount_readonly" value="#{stockMaintainView.selectedProductStock.productAmount.totalAmount}"/>
 
@@ -31,7 +31,7 @@
             </h:inputText>
         </h:panelGrid>
 
-        <p:panelGrid id="stockAmount2" rendered="#{stockMaintainView.selectedProductStock.supportSize}">
+        <p:panelGrid id="stockAmount2" rendered="#{stockMaintainView.selectedProductStock.category.supportSize}">
             <f:facet name="header">
                 <p:row>
                     <p:column>#4</p:column>

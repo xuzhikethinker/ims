@@ -42,6 +42,9 @@ public class OrderService {
     private CustomerService customerService;
 
     @Autowired
+    private SupportingDataService supportingDataService;
+
+    @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
 
     public void savePurchaseOrder(Map<String, ProductInfo> productInfoMap, PurchaseOrder purchaseOrder) {
@@ -50,18 +53,30 @@ public class OrderService {
         this.purchaseOrderRepository.saveAndFlush(purchaseOrder);
     }
 
-    public List<PurchaseOrder> findPurchaseOrderByPONumber(String poNumber){
+    public List<PurchaseOrder> findPurchaseOrderByPONumber(String poNumber) {
         return this.purchaseOrderRepository.findPurchaseOrderByPurchaseOrderNumber(poNumber.toUpperCase());
     }
 
-    public List<PurchaseOrder> searchPurchaseOrderList(final OrderSearchCriteria orderSearchCriteria){
+    public PurchaseOrder findPurchaseOrderByID(Long purchaseOrderID) {
+        PurchaseOrder order = this.purchaseOrderRepository.findOne(purchaseOrderID);
+        Map<String, ProductInfo> productInfoMap = supportingDataService.getProductInfoMap();
+        for (PurchaseOrderItem item : order.getOrderItemList()) {
+            ProductInfo productInfo = productInfoMap.get(item.getCompanyProductCode());
+            if (productInfo != null) {
+                item.setProductInfo(productInfo);
+            }
+        }
+        return order;
+    }
+
+    public List<PurchaseOrder> searchPurchaseOrderList(final OrderSearchCriteria orderSearchCriteria) {
         List<PurchaseOrder> purchaseOrders = new ArrayList<PurchaseOrder>();
         Specification<PurchaseOrder> speci = new Specification<PurchaseOrder>() {
             @Override
             public Predicate toPredicate(Root<PurchaseOrder> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<Predicate>();
-                if(StringUtils.isNotEmpty(orderSearchCriteria.getPurchaseOrderStatus())){
-                predicates.add(cb.equal(root.get("status"), orderSearchCriteria.getPurchaseOrderStatus()));
+                if (StringUtils.isNotEmpty(orderSearchCriteria.getPurchaseOrderStatus())) {
+                    predicates.add(cb.equal(root.get("status"), orderSearchCriteria.getPurchaseOrderStatus()));
                 }
 
                 if (StringUtils.isNotEmpty(orderSearchCriteria.getPurchaseOrderNum())) {

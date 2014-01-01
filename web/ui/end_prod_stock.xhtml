@@ -89,18 +89,18 @@
             <p:column>
                 <p:cellEditor>
                     <f:facet name="output">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size4Amount}" rendered="#{product.targetProductStock.supportSize}" />
-                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size4Amount})" />
+                        <h:outputText value="#{product.targetProductStock.productAmount.size4Amount}" rendered="#{product.targetProductStock.category.supportSize}" />
+                        &#160;<h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size4Amount})" />
                     </f:facet>
                     <f:facet name="input">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size4Amount}" rendered="#{product.targetProductStock.supportSize}" /><br/>
-                        <p:inputText value="#{product.newStockAmount.size4Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.productAmount.size4Amount>0}" style="width:80%;">
+                        <h:outputText value="#{product.targetProductStock.productAmount.size4Amount}" rendered="#{product.targetProductStock.category.supportSize}" /><br/>
+                        <p:inputText value="#{product.newStockAmount.size4Amount}"  rendered="#{product.targetProductStock.category.supportSize and product.relatedProductStock.productAmount.size4Amount>0}" style="width:80%;">
                             <o:validator validatorId="javax.faces.LongRange"
                                          minimum="0"
                                          maximum="#{product.relatedProductStock.productAmount.size4Amount}" message="#4 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.productAmount.size4Amount}" />
                             <p:clientValidator />
                         </p:inputText>
-                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size4Amount})" />
+                        <br/><h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size4Amount})" />
                     </f:facet>
                 </p:cellEditor>
             </p:column>
@@ -108,18 +108,18 @@
             <p:column>
                 <p:cellEditor>
                     <f:facet name="output">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size5Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
-                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size5Amount})" />
+                        <h:outputText value="#{product.targetProductStock.productAmount.size5Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size5Amount})" />
                     </f:facet>
                     <f:facet name="input">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size5Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
-                        <p:inputText value="#{product.newStockAmount.size5Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.productAmount.size5Amount>0}" style="width:80%">
+                        <h:outputText value="#{product.targetProductStock.productAmount.size5Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size5Amount}"  rendered="#{product.targetProductStock.category.supportSize and product.relatedProductStock.productAmount.size5Amount>0}" style="width:80%">
                             <o:validator validatorId="javax.faces.LongRange"
                                          minimum="0"
                                          maximum="#{product.relatedProductStock.productAmount.size5Amount}" message="#5 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.productAmount.size5Amount}" />
                             <p:clientValidator />
                         </p:inputText>
-                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size5Amount})" />
+                        <br/><h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size5Amount})" />
                     </f:facet>
                 </p:cellEditor>
             </p:column>
@@ -127,18 +127,18 @@
             <p:column>
                 <p:cellEditor>
                     <f:facet name="output">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size6Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
-                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size6Amount})" />
+                        <h:outputText value="#{product.targetProductStock.productAmount.size6Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size6Amount})" />
                     </f:facet>
                     <f:facet name="input">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size6Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
-                        <p:inputText value="#{product.newStockAmount.size6Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.productAmount.size6Amount>0}" style="width:80%">
+                        <h:outputText value="#{product.targetProductStock.productAmount.size6Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size6Amount}"  rendered="#{product.targetProductStock.category.supportSize and product.relatedProductStock.productAmount.size6Amount>0}" style="width:80%">
                             <o:validator validatorId="javax.faces.LongRange"
                                          minimum="0"
                                          maximum="#{product.relatedProductStock.productAmount.size6Amount}" message="#6 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.productAmount.size6Amount}" />
                             <p:clientValidator />
                         </p:inputText>
-                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size6Amount})" />
+                        <br/><h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size6Amount})" />
                     </f:facet>
                 </p:cellEditor>
             </p:column>
@@ -146,18 +146,18 @@
             <p:column>
                 <p:cellEditor>
                     <f:facet name="output">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size7Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
-                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size7Amount})" />
+                        <h:outputText value="#{product.targetProductStock.productAmount.size7Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size7Amount})" />
                     </f:facet>
                     <f:facet name="input">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size7Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
-                        <p:inputText value="#{product.newStockAmount.size7Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.productAmount.size7Amount>0}" style="width:80%">
+                        <h:outputText value="#{product.targetProductStock.productAmount.size7Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size7Amount}"  rendered="#{product.targetProductStock.category.supportSize and product.relatedProductStock.productAmount.size7Amount>0}" style="width:80%">
                             <o:validator validatorId="javax.faces.LongRange"
                                          minimum="0"
                                          maximum="#{product.relatedProductStock.productAmount.size7Amount}" message="#7 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.productAmount.size7Amount}" />
                             <p:clientValidator />
                         </p:inputText>
-                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size7Amount})" />
+                        <br/><h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size7Amount})" />
                     </f:facet>
                 </p:cellEditor>
             </p:column>
@@ -165,18 +165,18 @@
             <p:column>
                 <p:cellEditor>
                     <f:facet name="output">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size8Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
-                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size8Amount})" />
+                        <h:outputText value="#{product.targetProductStock.productAmount.size8Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size8Amount})" />
                     </f:facet>
                     <f:facet name="input">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size8Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
-                        <p:inputText value="#{product.newStockAmount.size8Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.productAmount.size8Amount>0}" style="width:80%">
+                        <h:outputText value="#{product.targetProductStock.productAmount.size8Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size8Amount}"  rendered="#{product.targetProductStock.category.supportSize and product.relatedProductStock.productAmount.size8Amount>0}" style="width:80%">
                             <o:validator validatorId="javax.faces.LongRange"
                                          minimum="0"
                                          maximum="#{product.relatedProductStock.productAmount.size8Amount}" message="#8 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.productAmount.size8Amount}" />
                             <p:clientValidator />
                         </p:inputText>
-                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size8Amount})" />
+                        <br/><h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size8Amount})" />
                     </f:facet>
                 </p:cellEditor>
             </p:column>
@@ -184,18 +184,18 @@
             <p:column>
                 <p:cellEditor>
                     <f:facet name="output">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size9Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
-                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size9Amount})" />
+                        <h:outputText value="#{product.targetProductStock.productAmount.size9Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size9Amount})" />
                     </f:facet>
                     <f:facet name="input">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size9Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
-                        <p:inputText value="#{product.newStockAmount.size9Amount}"  rendered="#{product.targetProductStock.supportSize and product.relatedProductStock.productAmount.size9Amount>0}" style="width:80%">
+                        <h:outputText value="#{product.targetProductStock.productAmount.size9Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size9Amount}"  rendered="#{product.targetProductStock.category.supportSize and product.relatedProductStock.productAmount.size9Amount>0}" style="width:80%">
                             <o:validator validatorId="javax.faces.LongRange"
                                          minimum="0"
                                          maximum="#{product.relatedProductStock.productAmount.size9Amount}" message="#9 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.productAmount.size9Amount}" />
                             <p:clientValidator />
                         </p:inputText>
-                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size9Amount})" />
+                        <br/><h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size9Amount})" />
                     </f:facet>
                 </p:cellEditor>
             </p:column>
@@ -203,18 +203,18 @@
             <p:column>
                 <p:cellEditor>
                     <f:facet name="output">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size10Amount}"  rendered="#{product.targetProductStock.supportSize}"/>
-                        &#160;<h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size10Amount})" />
+                        <h:outputText value="#{product.targetProductStock.productAmount.size10Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/>
+                        &#160;<h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size10Amount})" />
                     </f:facet>
                     <f:facet name="input">
-                        <h:outputText value="#{product.targetProductStock.productAmount.size10Amount}"  rendered="#{product.targetProductStock.supportSize}"/><br/>
-                        <p:inputText value="#{product.newStockAmount.size10Amount}"  rendered="#{product.targetProductStock.supportSize  and product.relatedProductStock.productAmount.size10Amount>0}" style="width:80%">
+                        <h:outputText value="#{product.targetProductStock.productAmount.size10Amount}"  rendered="#{product.targetProductStock.category.supportSize}"/><br/>
+                        <p:inputText value="#{product.newStockAmount.size10Amount}"  rendered="#{product.targetProductStock.category.supportSize  and product.relatedProductStock.productAmount.size10Amount>0}" style="width:80%">
                             <o:validator validatorId="javax.faces.LongRange"
                                          minimum="0"
                                          maximum="#{product.relatedProductStock.productAmount.size10Amount}" message="#10 请输入合法范围的数据: 0 ~ #{product.relatedProductStock.productAmount.size10Amount}" />
                             <p:clientValidator />
                         </p:inputText>
-                        <br/><h:outputText rendered="#{product.targetProductStock.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size10Amount})" />
+                        <br/><h:outputText rendered="#{product.targetProductStock.category.supportSize}" style="color: red;" value="(#{product.relatedProductStock.productAmount.size10Amount})" />
                     </f:facet>
                 </p:cellEditor>
             </p:column>
@@ -226,7 +226,7 @@
                     </f:facet>
                     <f:facet name="input">
                         <h:outputText value="#{product.targetProductStock.stockAmount}" /><br/>
-                        <p:inputText value="#{product.newStockAmount.stockAmount}"  rendered="#{!product.targetProductStock.supportSize and product.relatedProductStock.stockAmount>0}" style="width:80%">
+                        <p:inputText value="#{product.newStockAmount.stockAmount}"  rendered="#{!product.targetProductStock.category.supportSize and product.relatedProductStock.stockAmount>0}" style="width:80%">
                             <o:validator validatorId="javax.faces.LongRange"
                                          minimum="0"
                                          maximum="#{product.relatedProductStock.stockAmount}" message="请输入合法范围的数据: 0 ~ #{product.relatedProductStock.stockAmount}" />
