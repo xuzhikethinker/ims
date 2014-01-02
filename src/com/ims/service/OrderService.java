@@ -94,4 +94,8 @@ public class OrderService {
 
         return purchaseOrderRepository.findAll(speci);
     }
+
+    public void savePurchaseOrderItem(PurchaseOrderItem item){
+        this.purchaseOrderItemRepository.saveAndFlush(item);
+    }
 }

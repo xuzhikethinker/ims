@@ -3,6 +3,7 @@ package com.ims.webapp.view;
 import com.ims.domain.order.OrderStatus;
 import com.ims.domain.order.ProformaInvoice;
 import com.ims.domain.order.PurchaseOrder;
+import com.ims.domain.order.PurchaseOrderItem;
 import com.ims.domain.support.ProductInfo;
 import com.ims.webapp.view.criteria.OrderSearchCriteria;
 import com.ims.webapp.view.criteria.ProdSearchCriteria;
@@ -51,6 +52,9 @@ public class OrderMaintainView extends StockMaintainView {
     }
 
     public void updateOrderItem(RowEditEvent event) {
+        PurchaseOrderItem orderItem = (PurchaseOrderItem)event.getObject();
+        this.orderService.savePurchaseOrderItem(orderItem);
+        orderItem.setVersion(orderItem.getVersion()+1);
         System.out.println(event);
 //        selectedProductInfo = (ProductInfo) event.getObject();
 //        FacesMessage msg = new FacesMessage("更新产品信息", "产品信息成功更新");
