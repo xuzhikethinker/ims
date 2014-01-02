@@ -2,6 +2,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 template="/WEB-INF/template/layout.xhtml">
 
@@ -80,92 +81,177 @@
                 <p:dataTable id="poItemList" value="#{orderMaintainView.purchaseOrder.orderItemList}" var="orderItem" paginator="true" rows="10" editable="true"
                              paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
 
+                    <p:ajax event="rowEdit" listener="#{orderMaintainView.updateOrderItem}"/>
+                    <p:ajax event="rowEditCancel" listener="#{orderMaintainView.cancelUpdateOrderItem}"/>
+
                     <p:columnGroup type="header">
                         <p:row>
                             <p:column rowspan="2" headerText="产品代码" styleClass="table_header" style="width:10%"/>
-                            <p:column rowspan="2" headerText="产品类别" styleClass="table_header" style="width:10%"/>
+                            <p:column rowspan="2" headerText="Cust.No." styleClass="table_header" style="width:7%"/>
                             <p:column rowspan="2" headerText="产品图片" styleClass="table_header" style="width:10%"/>
-                            <p:column colspan="8" headerText="产品数量" styleClass="table_header"/>
-                            <p:column rowspan="2" headerText="操作" styleClass="table_header"/>
+                            <p:column colspan="10" headerText="产品数量" styleClass="table_header" style="width:65%"/>
+                            <p:column rowspan="2" headerText="操作" styleClass="table_header" style="width:8%"/>
                         </p:row>
 
                         <p:row>
-                            <p:column headerText="#4" styleClass="table_header" style="width:7%"/>
-                            <p:column headerText="#5" styleClass="table_header" style="width:7%"/>
-                            <p:column headerText="#6" styleClass="table_header" style="width:7%"/>
-                            <p:column headerText="#7" styleClass="table_header" style="width:7%"/>
-                            <p:column headerText="#8" styleClass="table_header" style="width:7%"/>
-                            <p:column headerText="#9" styleClass="table_header" style="width:7%"/>
-                            <p:column headerText="#10" styleClass="table_header" style="width:7%"/>
-                            <p:column headerText="总数" styleClass="table_header" style="width:7%"/>
+                            <p:column headerText="#4" styleClass="table_header" style="width:6%"/>
+                            <p:column headerText="#5" styleClass="table_header" style="width:6%"/>
+                            <p:column headerText="#6" styleClass="table_header" style="width:6%"/>
+                            <p:column headerText="#7" styleClass="table_header" style="width:6%"/>
+                            <p:column headerText="#8" styleClass="table_header" style="width:6%"/>
+                            <p:column headerText="#9" styleClass="table_header" style="width:6%"/>
+                            <p:column headerText="#10" styleClass="table_header" style="width:6%"/>
+                            <p:column headerText="单价" styleClass="table_header" style="width:5%"/>
+                            <p:column headerText="总数" styleClass="table_header" style="width:5%"/>
+                            <p:column headerText="总价" styleClass="table_header" style="width:4%"/>
                         </p:row>
                     </p:columnGroup>
 
+                    <c:set var="supportSize" value="#{orderItem.productInfo.category.supportSize}"/>
                     <!-- 产品代码 -->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.companyProductCode}"/>
+                        <p:outputLabel id="code" value="#{orderItem.companyProductCode}"/>
+                        <p:tooltip for="code" value="#{orderItem.productInfo.categoryCode}" showEffect="fade" hideEffect="fade" />
                     </p:column>
 
                     <!-- 产品类别 -->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productInfo.categoryCode}"/>
+                        <h:outputText value="#{orderItem.customerProductCode}"/>
                     </p:column>
 
                     <!-- 产品图片 -->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productInfo.pictureName}"/>
+                        <p:graphicImage
+                                value="/resources/upload/#{orderItem.productInfo.pictureName}"/>
                     </p:column>
 
                     <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productAmount.size4Amount}"/>
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{orderItem.productAmount.size4Amount}}"
-                                              rendered="#{product.targetProductStock.category.supportSize}"/>
+                                              rendered="#{supportSize}"/>
                             </f:facet>
                             <f:facet name="input">
                                 <p:inputText value="#{orderItem.productAmount.size4Amount}"
-                                             rendered="#{product.targetProductStock.category.supportSize}" style="width:100%"/>
+                                             rendered="#{supportSize}" style="width:100%"/>
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
 
                     <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productAmount.size5Amount}"/>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{orderItem.productAmount.size5Amount}}"
+                                              rendered="#{supportSize}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{orderItem.productAmount.size5mount}"
+                                             rendered="#{supportSize}" style="width:100%"/>
+                            </f:facet>
+                        </p:cellEditor>
                     </p:column>
 
                     <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productAmount.size6Amount}"/>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{orderItem.productAmount.size6Amount}}"
+                                              rendered="#{supportSize}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{orderItem.productAmount.size6mount}"
+                                             rendered="#{supportSize}" style="width:100%"/>
+                            </f:facet>
+                        </p:cellEditor>
                     </p:column>
 
                     <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productAmount.size7Amount}"/>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{orderItem.productAmount.size7Amount}}"
+                                              rendered="#{supportSize}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{orderItem.productAmount.size7mount}"
+                                             rendered="#{supportSize}" style="width:100%"/>
+                            </f:facet>
+                        </p:cellEditor>
                     </p:column>
 
                     <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productAmount.size8Amount}"/>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{orderItem.productAmount.size8Amount}}"
+                                              rendered="#{supportSize}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{orderItem.productAmount.size8mount}"
+                                             rendered="#{supportSize}" style="width:100%"/>
+                            </f:facet>
+                        </p:cellEditor>
                     </p:column>
 
                     <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productAmount.size9Amount}"/>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{orderItem.productAmount.size9Amount}}"
+                                              rendered="#{supportSize}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{orderItem.productAmount.size9mount}"
+                                             rendered="#{supportSize}" style="width:100%"/>
+                            </f:facet>
+                        </p:cellEditor>
                     </p:column>
 
                     <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productAmount.size10Amount}"/>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{orderItem.productAmount.size10Amount}}"
+                                              rendered="#{supportSize}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{orderItem.productAmount.size10mount}"
+                                             rendered="#{supportSize}" style="width:100%"/>
+                            </f:facet>
+                        </p:cellEditor>
                     </p:column>
 
                     <!-- 产品数量-->
                     <p:column styleClass="table_header">
-                        <h:outputText value="#{orderItem.productAmount.totalAmount}"/>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{orderItem.unitPrice}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{orderItem.unitPrice}" style="width:100%"/>
+                            </f:facet>
+                        </p:cellEditor>
                     </p:column>
 
+                    <!-- 产品数量-->
+                    <p:column styleClass="table_header">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{orderItem.productAmount.totalAmount}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{orderItem.productAmount.totalAmount}"
+                                             rendered="#{!supportSize}" style="width:100%"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <!-- 产品代码 -->
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{orderItem.totalPrice}"/>
+                    </p:column>
                     <!-- 产品数量-->
                     <p:column styleClass="table_header">
                         <p:rowEditor/>

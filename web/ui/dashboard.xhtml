@@ -4,7 +4,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
     <p:panel header="半成品-低于预警量产品列表" style="margin-left: 5px;width: 95%" toggleable="true" toggleSpeed="500" collapsed="true">
-        <p:dataTable id="productSemiStockTable" value="#{stockMaintainView.stockInfoDTOList}" var="product"
+        <p:dataTable id="productSemiStockTable" value="#{stockMaintainView.alertedSemiStockInfoList}" var="product"
                      paginator="true" rows="10"
                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
             <p:columnGroup type="header">
@@ -28,61 +28,61 @@
             </p:columnGroup>
 
             <p:column>
-                #{product.targetProductStock.productCode}
+                #{product.productCode}
             </p:column>
 
             <p:column>
-                #{product.targetProductStock.categoryCode}
+                #{product.categoryCode}
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.targetProductStock.productAmount.size4Amount}"
-                              rendered="#{product.targetProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size4Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.targetProductStock.productAmount.size5Amount}"
-                              rendered="#{product.targetProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size5Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.targetProductStock.productAmount.size6Amount}"
-                              rendered="#{product.targetProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size6Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.targetProductStock.productAmount.size7Amount}"
-                              rendered="#{product.targetProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size7Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.targetProductStock.productAmount.size8Amount}"
-                              rendered="#{product.targetProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size8Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.targetProductStock.productAmount.size9Amount}"
-                              rendered="#{product.targetProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size9Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.targetProductStock.productAmount.size10Amount}"
-                              rendered="#{product.targetProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size10Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.targetProductStock.productAmount.totalAmount}"/>
+                <h:outputText value="#{product.productAmount.totalAmount}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.targetProductStock.alertStockAmount}"/>
+                <h:outputText value="#{product.alertStockAmount}"/>
             </p:column>
 
         </p:dataTable>
     </p:panel>
     <br/>
     <p:panel header="成品-低于预警量产品列表" style="margin-left: 5px;width: 95%" toggleable="true" toggleSpeed="500" collapsed="true" >
-        <p:dataTable id="productEndStockTable" value="#{stockMaintainView.stockInfoDTOList}" var="product"
+        <p:dataTable id="productEndStockTable" value="#{stockMaintainView.alertedEndStockInfoList}" var="product"
                      paginator="true" rows="10"
                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
             <p:columnGroup type="header">
@@ -106,54 +106,54 @@
             </p:columnGroup>
 
             <p:column>
-                #{product.relatedProductStock.productCode}
+                #{product.productCode}
             </p:column>
 
             <p:column>
-                #{product.relatedProductStock.categoryCode}
+                #{product.categoryCode}
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.relatedProductStock.productAmount.size4Amount}"
-                              rendered="#{product.relatedProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size4Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.relatedProductStock.productAmount.size5Amount}"
-                              rendered="#{product.relatedProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size5Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.relatedProductStock.productAmount.size6Amount}"
-                              rendered="#{product.relatedProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size6Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.relatedProductStock.productAmount.size7Amount}"
-                              rendered="#{product.relatedProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size7Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.relatedProductStock.productAmount.size8Amount}"
-                              rendered="#{product.relatedProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size8Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.relatedProductStock.productAmount.size9Amount}"
-                              rendered="#{product.relatedProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size9Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.relatedProductStock.productAmount.size10Amount}"
-                              rendered="#{product.relatedProductStock.category.supportSize}"/>
+                <h:outputText value="#{product.productAmount.size10Amount}"
+                              rendered="#{product.category.supportSize}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.relatedProductStock.productAmount.totalAmount}"/>
+                <h:outputText value="#{product.productAmount.totalAmount}"/>
             </p:column>
 
             <p:column>
-                <h:outputText value="#{product.relatedProductStock.alertStockAmount}"/>
+                <h:outputText value="#{product.alertStockAmount}"/>
             </p:column>
 
         </p:dataTable>

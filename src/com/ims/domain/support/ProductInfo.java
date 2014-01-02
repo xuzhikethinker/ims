@@ -30,7 +30,7 @@ public class ProductInfo extends PersistenceDomain {
     @Column(name = "CATEGORY_CODE")
     private String categoryCode;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, optional = true, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "CATEGORY_ID")
     private ProductCategory category;
 

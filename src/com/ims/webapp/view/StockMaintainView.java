@@ -27,6 +27,8 @@ public class StockMaintainView extends BaseView {
     private ProdStockSearchCriteria stockSearchCriteria = new ProdStockSearchCriteria();
     private ProductStockAmountDTO newStockAmount = new ProductStockAmountDTO();
     private List<ProductStockInfo> alertedStockInfoList = new ArrayList<ProductStockInfo>();
+    private List<ProductStockInfo> alertedSemiStockInfoList = new ArrayList<ProductStockInfo>();
+    private List<ProductStockInfo> alertedEndStockInfoList = new ArrayList<ProductStockInfo>();
 
     private ProductStockInfo selectedProductStock;
 
@@ -57,8 +59,23 @@ public class StockMaintainView extends BaseView {
         Map<String, ProductStockInfo> semiStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey(criteria);
         criteria.setStockType(StockType.Finished.getCode());
         Map<String, ProductStockInfo> endStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey(criteria);
-        buildStockInfoDTO(semiStockMap, endStockMap);
+        Map<String, ProductCategory> categoryMap = this.supportingDataService.loadProdCategoryMap();
+        for(String prodCode: semiStockMap.keySet()){
+            ProductStockInfo stockInfo = semiStockMap.get(prodCode);
+            ProductCategory category = categoryMap.get(stockInfo.getCategoryCode());
+            stockInfo.setCategory(category);
+            alertedSemiStockInfoList.add(stockInfo);
+        }
+
+        for(String prodCode: endStockMap.keySet()){
+            ProductStockInfo stockInfo = endStockMap.get(prodCode);
+            ProductCategory category = categoryMap.get(stockInfo.getCategoryCode());
+            stockInfo.setCategory(category);
+            alertedEndStockInfoList.add(stockInfo);
+        }
     }
+
+
 
     private void buildStockInfoDTO(Map<String, ProductStockInfo> semiStockMap, Map<String, ProductStockInfo> endStockMap) {
         boolean semiProdStock = ProductStockInfoService.SEMI_PROD_STOCK.equalsIgnoreCase(getMenuCode());
@@ -209,5 +226,21 @@ public class StockMaintainView extends BaseView {
 
     public void setAlertedStockInfoList(List<ProductStockInfo> alertedStockInfoList) {
         this.alertedStockInfoList = alertedStockInfoList;
+    }
+
+    public List<ProductStockInfo> getAlertedSemiStockInfoList() {
+        return alertedSemiStockInfoList;
+    }
+
+    public void setAlertedSemiStockInfoList(List<ProductStockInfo> alertedSemiStockInfoList) {
+        this.alertedSemiStockInfoList = alertedSemiStockInfoList;
+    }
+
+    public List<ProductStockInfo> getAlertedEndStockInfoList() {
+        return alertedEndStockInfoList;
+    }
+
+    public void setAlertedEndStockInfoList(List<ProductStockInfo> alertedEndStockInfoList) {
+        this.alertedEndStockInfoList = alertedEndStockInfoList;
     }
 }

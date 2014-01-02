@@ -8,6 +8,7 @@ import com.ims.webapp.view.criteria.OrderSearchCriteria;
 import com.ims.webapp.view.criteria.ProdSearchCriteria;
 import com.ims.webapp.view.dto.OrderStatusDTO;
 import com.ims.webapp.view.dto.ProductInfoDataModel;
+import org.primefaces.event.RowEditEvent;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -47,6 +48,23 @@ public class OrderMaintainView extends StockMaintainView {
     public String gotoModifyPO(){
 
         return "po_maintain";
+    }
+
+    public void updateOrderItem(RowEditEvent event) {
+        System.out.println(event);
+//        selectedProductInfo = (ProductInfo) event.getObject();
+//        FacesMessage msg = new FacesMessage("更新产品信息", "产品信息成功更新");
+//        this.supportingDataService.updateProductInfo(selectedProductInfo);
+//        reloadData(SupportingDataService.MENU_CODE_PROD_INFO);
+//        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+
+    public void cancelUpdateOrderItem(RowEditEvent event) {
+//        selectedProductInfo = (ProductInfo) event.getObject();
+//        FacesMessage msg = new FacesMessage("更新产品信息", "产品信息成功更新");
+//        this.supportingDataService.updateProductInfo(selectedProductInfo);
+//        reloadData(SupportingDataService.MENU_CODE_PROD_INFO);
+//        FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
     public String getOrderAction() {
