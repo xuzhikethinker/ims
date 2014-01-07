@@ -35,6 +35,9 @@ public class OrderMaintainView extends StockMaintainView {
     private OrderSearchCriteria orderSearchCriteria = new OrderSearchCriteria();
     private List<PurchaseOrder> purchaseOrderList = new ArrayList<PurchaseOrder>();
 
+    public OrderMaintainView(){
+        System.out.println("OrderMaintainView="+this);
+    }
     public void loadData() {
         prodCategoryList = this.supportingDataService.loadProdCategoryList(true);
         this.productList = this.supportingDataService.getProductInfoList(new ProdSearchCriteria());
@@ -53,9 +56,8 @@ public class OrderMaintainView extends StockMaintainView {
 
     public void updateOrderItem(RowEditEvent event) {
         PurchaseOrderItem orderItem = (PurchaseOrderItem)event.getObject();
-        this.orderService.savePurchaseOrderItem(orderItem);
-        orderItem.setVersion(orderItem.getVersion()+1);
-        System.out.println(event);
+        this.purchaseOrder = this.orderService.savePurchaseOrderItem(orderItem);
+        System.out.println("total="+this.purchaseOrder.getTotalPrice());
 //        selectedProductInfo = (ProductInfo) event.getObject();
 //        FacesMessage msg = new FacesMessage("更新产品信息", "产品信息成功更新");
 //        this.supportingDataService.updateProductInfo(selectedProductInfo);

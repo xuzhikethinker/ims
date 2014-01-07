@@ -95,7 +95,18 @@ public class OrderService {
         return purchaseOrderRepository.findAll(speci);
     }
 
-    public void savePurchaseOrderItem(PurchaseOrderItem item){
-        this.purchaseOrderItemRepository.saveAndFlush(item);
+    public PurchaseOrder savePurchaseOrderItem(PurchaseOrderItem item){
+        item.setTotalPrice(item.getProductAmount().getTotalAmount()*item.getUnitPrice());
+        PurchaseOrder purchaseOrder = item.getOwner();
+//        PurchaseOrderItem updatedItem = this.purchaseOrderItemRepository.saveAndFlush(item);
+//        PurchaseOrder purchaseOrder = updatedItem.getOwner();
+        List<PurchaseOrderItem> items = purchaseOrder.getOrderItemList();
+        double total = 0l;
+        for(PurchaseOrderItem dbItem:items){
+            total += dbItem.getTotalPrice();
+        }
+        purchaseOrder.setTotalPrice(total);
+        purchaseOrder = this.purchaseOrderRepository.saveAndFlush(purchaseOrder);
+        return purchaseOrder;
     }
 }

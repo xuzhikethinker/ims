@@ -73,15 +73,12 @@
                 </p:panelGrid>
             </p:tab>
             <p:tab id="POItemListTab" title="PO产品项">
-                <p:commandLink id="addItem" style="margin-right:20px;" process="@this"
-                               oncomplete="PF('poItemDialog').show()">
-                    <h:outputText value="#{orderMaintainView.purchaseOrder.totalPrice}"/>
-                </p:commandLink>
+
 
                 <p:dataTable id="poItemList" value="#{orderMaintainView.purchaseOrder.orderItemList}" var="orderItem" paginator="true" rows="10" editable="true"
                              paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
 
-                    <p:ajax event="rowEdit" listener="#{orderMaintainView.updateOrderItem}"/>
+                    <p:ajax event="rowEdit" listener="#{orderMaintainView.updateOrderItem}" update="poItemList"/>
                     <p:ajax event="rowEditCancel" listener="#{orderMaintainView.cancelUpdateOrderItem}"/>
 
                     <p:columnGroup type="header">
@@ -110,7 +107,7 @@
                     <c:set var="supportSize" value="#{orderItem.productInfo.category.supportSize}"/>
                     <!-- 产品代码 -->
                     <p:column styleClass="table_header">
-                        <p:outputLabel id="code" value="#{orderItem.companyProductCode}"/>
+                        <p:outputLabel id="code" value="#{orderItem.companyProductCode}=#{orderItem.version}"/>
                         <p:tooltip for="code" value="#{orderItem.productInfo.categoryCode}" showEffect="fade" hideEffect="fade" />
                     </p:column>
 
@@ -256,7 +253,15 @@
                     <p:column styleClass="table_header">
                         <p:rowEditor/>
                     </p:column>
+
+                    <f:facet name="footer">
+                        PO total price  <h:outputText id="totalPrice" value="#{orderMaintainView.purchaseOrder.totalPrice}"/>
+                    </f:facet>
                 </p:dataTable>
+                <p:panelGrid id="output" >
+                    <h:outputText id="total" value="#{orderMaintainView.purchaseOrder.totalPrice}"/>
+                </p:panelGrid>
+
             </p:tab>
         </p:tabView>
     </ui:define>
