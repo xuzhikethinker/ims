@@ -25,4 +25,9 @@
     <factory>
         <exception-handler-factory>com.ims.webapp.view.IMSExceptionHandlerFactory</exception-handler-factory>
     </factory>
+
+    <!--<converter>-->
+        <!--<converter-id>productInfoConverter</converter-id>-->
+        <!--<converter-class>com.ims.webapp.view.converter.ProductInfoConverter</converter-class>-->
+    <!--</converter>-->
 </faces-config>

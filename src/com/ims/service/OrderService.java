@@ -48,8 +48,10 @@ public class OrderService {
     private PurchaseOrderRepository purchaseOrderRepository;
 
     public void savePurchaseOrder(Map<String, ProductInfo> productInfoMap, PurchaseOrder purchaseOrder) {
+        this.purchaseOrderRepository.saveAndFlush(purchaseOrder);
+    }
 
-
+    public void savePurchaseOrder(PurchaseOrder purchaseOrder){
         this.purchaseOrderRepository.saveAndFlush(purchaseOrder);
     }
 

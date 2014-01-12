@@ -32,7 +32,7 @@
 
     <context:annotation-config/>
     <context:component-scan base-package="com.ims"/>
-
+    <bean id="spring" class="com.ims.webapp.view.util.SpringUtil" />
     <jpa:repositories base-package="com.ims.repository" entity-manager-factory-ref="entityManagerFactory"
                       transaction-manager-ref="transactionManager"/>
 

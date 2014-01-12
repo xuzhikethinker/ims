@@ -95,4 +95,12 @@ public class PurchaseOrder extends OrderGeneralInfo {
         }
         return items;
     }
+
+    public void caculateTotalAmount(){
+        double total = 0l;
+        for(PurchaseOrderItem item:this.getOrderItemList()){
+            total += item.getTotalPrice();
+        }
+        this.setTotalPrice(total);
+    }
 }

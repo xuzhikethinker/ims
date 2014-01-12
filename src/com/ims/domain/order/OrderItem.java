@@ -96,4 +96,14 @@ public abstract class OrderItem extends PersistenceDomain {
     public void setProductAmount(ProductAmount productAmount) {
         this.productAmount = productAmount;
     }
+
+    public int getTotalAmountBy(boolean supportSize){
+        if(supportSize){
+            int total = this.productAmount.getSize4Amount()+this.productAmount.getSize5Amount()+this.productAmount.getSize6Amount()+this.productAmount.getSize7Amount()+this.productAmount.getSize8Amount()+this.productAmount.getSize9Amount()+this.productAmount.getSize10Amount();
+            this.productAmount.setTotalAmount(total);
+            return total;
+        }else{
+            return this.productAmount.getTotalAmount();
+        }
+    }
 }

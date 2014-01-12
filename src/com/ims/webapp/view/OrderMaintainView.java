@@ -9,11 +9,22 @@ import com.ims.webapp.view.criteria.OrderSearchCriteria;
 import com.ims.webapp.view.criteria.ProdSearchCriteria;
 import com.ims.webapp.view.dto.OrderStatusDTO;
 import com.ims.webapp.view.dto.ProductInfoDataModel;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.primefaces.event.RowEditEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.util.Constants;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @ManagedBean(name = "orderMaintainView")
@@ -34,6 +45,9 @@ public class OrderMaintainView extends StockMaintainView {
     private Long purchaseOrderID;
     private OrderSearchCriteria orderSearchCriteria = new OrderSearchCriteria();
     private List<PurchaseOrder> purchaseOrderList = new ArrayList<PurchaseOrder>();
+    private ProductInfo selectedProd;
+    private boolean supportSize;
+    private PurchaseOrderItem newOrderItem = new PurchaseOrderItem();
 
     public OrderMaintainView(){
         System.out.println("OrderMaintainView="+this);
@@ -46,6 +60,7 @@ public class OrderMaintainView extends StockMaintainView {
 
     public void loadPO(){
         this.purchaseOrder = this.orderService.findPurchaseOrderByID(purchaseOrderID);
+        this.productList = this.supportingDataService.getProductInfoList(new ProdSearchCriteria());
         System.out.println("id="+this.purchaseOrderID);
     }
 
@@ -205,11 +220,107 @@ public class OrderMaintainView extends StockMaintainView {
         return orderStatusDTOs;
     }
 
+    public String savePurchaseOrder(){
+        this.orderService.savePurchaseOrder(this.purchaseOrder);
+        this.purchaseOrder = this.orderService.findPurchaseOrderByID(this.purchaseOrder.getId());
+        return null;
+    }
+
+    public String exportExcel() throws IOException {
+        this.orderService.savePurchaseOrder(this.purchaseOrder);
+        this.purchaseOrder = this.orderService.findPurchaseOrderByID(this.purchaseOrder.getId());
+        InputStream fileinputstream = this.getServletContext().getResourceAsStream("/resources/download/ConfirmPI-template.xls");
+        POIFSFileSystem poifsfilesystem = new POIFSFileSystem(fileinputstream);
+        Workbook wb = new HSSFWorkbook(poifsfilesystem);
+        Sheet sheet = wb.getSheetAt(0);
+        writeExcelToResponse(this.getCurrentExternalContext(), wb, "PI.xls");
+        return null;
+    }
+
     public List<PurchaseOrder> getPurchaseOrderList() {
         return purchaseOrderList;
     }
 
     public void setPurchaseOrderList(List<PurchaseOrder> purchaseOrderList) {
         this.purchaseOrderList = purchaseOrderList;
+    }
+
+    public ProductInfo getSelectedProd() {
+        return selectedProd;
+    }
+
+    public void setSelectedProd(ProductInfo selectedProd) {
+        this.selectedProd = selectedProd;
+    }
+
+    public List<ProductInfo> completeProductInfoList(String code){
+        List<ProductInfo> result = new ArrayList<ProductInfo>();
+        for(ProductInfo productInfo:this.productList){
+            if(productInfo.getProductCode().toUpperCase().contains(code.toUpperCase())){
+                result.add(productInfo);
+            }
+        }
+        return result;
+    }
+
+    public void addNewPOItem(SelectEvent e){
+        Object item = e.getObject();
+        supportSize = this.selectedProd.getCategory().isSupportSize();
+        newOrderItem.setOwner(this.getPurchaseOrder());
+        newOrderItem.setTotalPrice(0l);
+        newOrderItem.setPoNumber(this.purchaseOrder.getPurchaseOrderNumber());
+        newOrderItem.setCompanyProductCode(this.selectedProd.getProductCode());
+        newOrderItem.setDisplaySeq(this.purchaseOrderList.size() + 1);
+        newOrderItem.setUnitPrice(1l);
+        newOrderItem.setPoItemCode("newItemCode");
+        newOrderItem.setCustomerProductCode("CustomerProdCode");
+        newOrderItem.setProductInfo(this.getSelectedProd());
+        newOrderItem.setUnitPrice(this.getSelectedProd().getPrice());
+        this.purchaseOrder.addOrderItemToList(newOrderItem);
+        System.out.println("new Item Prod = "+item);
+    }
+
+    public boolean isSupportSize() {
+        return supportSize;
+    }
+
+    public void setSupportSize(boolean supportSize) {
+        this.supportSize = supportSize;
+    }
+
+    public PurchaseOrderItem getNewOrderItem() {
+        return newOrderItem;
+    }
+
+    public void setNewOrderItem(PurchaseOrderItem newOrderItem) {
+        this.newOrderItem = newOrderItem;
+    }
+    public String addOrderItemToPurchaseOrder(){
+        this.purchaseOrder.addOrderItemToList(this.newOrderItem);
+        newOrderItem.setDisplaySeq(purchaseOrder.getOrderItemList().size());
+        newOrderItem.setPoNumber(this.purchaseOrder.getPurchaseOrderNumber());
+        newOrderItem.setPoItemCode(this.purchaseOrder.getPurchaseOrderNumber() + "_" + newOrderItem.getDisplaySeq());
+        newOrderItem.setCustomerProductCode(this.getSelectedProd().getCustomerProductCode());
+        newOrderItem.setTotalPrice(newOrderItem.getUnitPrice()*newOrderItem.getTotalAmountBy(newOrderItem.getProductInfo().getCategory().isSupportSize()));
+        this.purchaseOrder.caculateTotalAmount();
+        this.orderService.savePurchaseOrder(this.purchaseOrder);
+        purchaseOrderID = this.purchaseOrder.getId();
+        this.purchaseOrder = this.orderService.findPurchaseOrderByID(purchaseOrderID);
+        newOrderItem = new PurchaseOrderItem();
+        selectedProd = new ProductInfo();
+        return null;
+    }
+
+    protected void writeExcelToResponse(ExternalContext externalContext, Workbook generatedExcel, String filename) throws IOException {
+        externalContext.setResponseContentType("application/vnd.ms-excel");
+        externalContext.setResponseHeader("Expires", "0");
+        externalContext.setResponseHeader("Cache-Control","must-revalidate, post-check=0, pre-check=0");
+        externalContext.setResponseHeader("Pragma", "public");
+        externalContext.setResponseHeader("Content-disposition", "attachment;filename="+ filename + ".xls");
+        externalContext.addResponseCookie(Constants.DOWNLOAD_COOKIE, "true", Collections.<String, Object>emptyMap());
+
+        OutputStream out = externalContext.getResponseOutputStream();
+        generatedExcel.write(out);
+        externalContext.responseFlushBuffer();
     }
 }

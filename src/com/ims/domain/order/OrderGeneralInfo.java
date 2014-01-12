@@ -21,9 +21,14 @@ public class OrderGeneralInfo extends PersistenceDomain {
     @Column(name = "CUSTOMER_NAME")
     protected String customerName;
 
+    @Column(name = "SHIP_TO")
+    protected String shipTo;
+
     @Column(name = "CUSTOMER_CODE")
     protected String customerCode;
 
+    @Column(name = "ISSUER")
+    protected String issuer;
     @Column(name = "TOTAL_PRICE")
     protected double totalPrice;
 
@@ -93,5 +98,21 @@ public class OrderGeneralInfo extends PersistenceDomain {
 
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getShipTo() {
+        return shipTo;
+    }
+
+    public void setShipTo(String shipTo) {
+        this.shipTo = shipTo;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 }
