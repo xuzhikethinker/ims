@@ -277,17 +277,20 @@
         PO total price <h:outputText id="totalPrice" value="#{orderMaintainView.purchaseOrder.totalPrice}"/>
     </f:facet>
 </p:dataTable>
-
+<h:commandLink>
+    <p:outputLabel value="Excel1111" />
+    <p:dataExporter type="xls" target="poItemList" fileName="cars" />
+</h:commandLink>
 <br/>
-<p:panel id="newPOItem" header="添加PO产品项" toggleable="true" closable="false" toggleSpeed="500"
-         closeSpeed="500" widgetVar="unitPanel" collapsed="true">
+<p:panel id="newPOItem" header="添加PO产品项" toggleable="true" closable="false" toggleSpeed="500" closeSpeed="500" widgetVar="unitPanel" collapsed="true">
+    <p:ajax event="toggle" listener="#{orderMaintainView.handleToggle}" update="newPOItem" />
+    <p:ajax event="close" listener="#{orderMaintainView.handleClose}" update="newPOItem"/>
     <p:growl id="amountError" showDetail="false"/>
     <h:panelGrid columns="2" id="editUnitSection">
         <h:outputLabel value="产品编号 : *" for="item"></h:outputLabel>
-        <p:autoComplete value="#{orderMaintainView.selectedProd}" id="item"
-                        completeMethod="#{orderMaintainView.completeProductInfoList}"
+        <p:autoComplete value="#{orderMaintainView.selectedProd}" id="item" completeMethod="#{orderMaintainView.completeProductInfoList}"
                         var="p" itemLabel="#{p.productCode}" itemValue="#{p}" converter="#{productInfoConverter}"
-                        forceSelection="true" required="true" requiredMessage="请选择产品编号" >
+                        forceSelection="true"  required="#{orderMaintainView.addNewOrderItem}" requiredMessage="请选择产品编号" >
             <p:ajax event="itemSelect" listener="#{orderMaintainView.addNewPOItem}" update="itemAmount"/>
         </p:autoComplete>
     </h:panelGrid>
@@ -296,16 +299,16 @@
         <h:panelGrid columns="23" id="amount">
 
             <h:outputLabel value="产品价格 :"></h:outputLabel>
-            <p:inputText  value="#{orderMaintainView.newOrderItem.unitPrice}" rendered="true" requiredMessage="请输入产品价格" converterMessage="产品价格必须为数字"   style="width: 40px">
+            <p:inputText  value="#{orderMaintainView.newOrderItem.unitPrice}" rendered="#{orderMaintainView.addNewOrderItem}"  required="#{orderMaintainView.addNewOrderItem}" requiredMessage="请输入产品价格" converterMessage="产品价格必须为数字"   style="width: 40px">
                 <o:validator validatorId="javax.faces.DoubleRange"  minimum="0.01" message="产品价格必须大于0.01"/>
                 <p:clientValidator />
                               </p:inputText>
             <p:spacer width="10" height="10"/>
 
             <h:outputLabel value="产品数量 :" rendered="#{!orderMaintainView.supportSize}"></h:outputLabel>
-            <p:inputText rendered="#{!orderMaintainView.supportSize}"
+            <p:inputText rendered="#{!orderMaintainView.supportSize and orderMaintainView.addNewOrderItem}"
                          value="#{orderMaintainView.newOrderItem.productAmount.totalAmount}"
-                         style="width: 25px" required="true" converterMessage="产品数量必须为数字" requiredMessage="请输入产品数量">
+                         style="width: 25px"  required="#{orderMaintainView.addNewOrderItem}" converterMessage="产品数量必须为数字" requiredMessage="请输入产品数量">
                 <o:validator validatorId="javax.faces.LongRange"  minimum="1" message="产品数量必须大于0"/>
                 <p:clientValidator />
             </p:inputText>

@@ -9,12 +9,15 @@ import com.ims.webapp.view.criteria.OrderSearchCriteria;
 import com.ims.webapp.view.criteria.ProdSearchCriteria;
 import com.ims.webapp.view.dto.OrderStatusDTO;
 import com.ims.webapp.view.dto.ProductInfoDataModel;
+import com.ims.webapp.view.util.POExcelGenerator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.ToggleEvent;
+import org.primefaces.model.Visibility;
 import org.primefaces.util.Constants;
 
 import javax.faces.bean.ManagedBean;
@@ -48,31 +51,33 @@ public class OrderMaintainView extends StockMaintainView {
     private ProductInfo selectedProd;
     private boolean supportSize;
     private PurchaseOrderItem newOrderItem = new PurchaseOrderItem();
+    public boolean addNewOrderItem = false;
 
-    public OrderMaintainView(){
-        System.out.println("OrderMaintainView="+this);
+    public OrderMaintainView() {
+        System.out.println("OrderMaintainView=" + this);
     }
+
     public void loadData() {
         prodCategoryList = this.supportingDataService.loadProdCategoryList(true);
         this.productList = this.supportingDataService.getProductInfoList(new ProdSearchCriteria());
         productInfoDataModel = new ProductInfoDataModel(this.productList);
     }
 
-    public void loadPO(){
+    public void loadPO() {
         this.purchaseOrder = this.orderService.findPurchaseOrderByID(purchaseOrderID);
         this.productList = this.supportingDataService.getProductInfoList(new ProdSearchCriteria());
-        System.out.println("id="+this.purchaseOrderID);
+        System.out.println("id=" + this.purchaseOrderID);
     }
 
-    public String gotoModifyPO(){
+    public String gotoModifyPO() {
 
         return "po_maintain";
     }
 
     public void updateOrderItem(RowEditEvent event) {
-        PurchaseOrderItem orderItem = (PurchaseOrderItem)event.getObject();
+        PurchaseOrderItem orderItem = (PurchaseOrderItem) event.getObject();
         this.purchaseOrder = this.orderService.savePurchaseOrderItem(orderItem);
-        System.out.println("total="+this.purchaseOrder.getTotalPrice());
+        System.out.println("total=" + this.purchaseOrder.getTotalPrice());
 //        selectedProductInfo = (ProductInfo) event.getObject();
 //        FacesMessage msg = new FacesMessage("更新产品信息", "产品信息成功更新");
 //        this.supportingDataService.updateProductInfo(selectedProductInfo);
@@ -165,7 +170,7 @@ public class OrderMaintainView extends StockMaintainView {
         return poItemList;
     }
 
-    public String searchPurchaseOrder(){
+    public String searchPurchaseOrder() {
         purchaseOrderList = this.orderService.searchPurchaseOrderList(orderSearchCriteria);
         return null;
     }
@@ -198,29 +203,29 @@ public class OrderMaintainView extends StockMaintainView {
         this.orderSearchCriteria = orderSearchCriteria;
     }
 
-    public List<OrderStatusDTO> getPurchaseOrderStatus(){
+    public List<OrderStatusDTO> getPurchaseOrderStatus() {
         List<OrderStatusDTO> orderStatusDTOs = new ArrayList<OrderStatusDTO>();
-        for(OrderStatus status:OrderStatus.values()){
-            if(status.isPoStatus()){
-                OrderStatusDTO statusDTO = new OrderStatusDTO(status.getCode(),status.getDescription());
+        for (OrderStatus status : OrderStatus.values()) {
+            if (status.isPoStatus()) {
+                OrderStatusDTO statusDTO = new OrderStatusDTO(status.getCode(), status.getDescription());
                 orderStatusDTOs.add(statusDTO);
             }
         }
         return orderStatusDTOs;
     }
 
-    public List<OrderStatusDTO> getProformaInvoiceStatus(){
+    public List<OrderStatusDTO> getProformaInvoiceStatus() {
         List<OrderStatusDTO> orderStatusDTOs = new ArrayList<OrderStatusDTO>();
-        for(OrderStatus status:OrderStatus.values()){
-            if(!status.isPoStatus()){
-                OrderStatusDTO statusDTO = new OrderStatusDTO(status.getCode(),status.getDescription());
+        for (OrderStatus status : OrderStatus.values()) {
+            if (!status.isPoStatus()) {
+                OrderStatusDTO statusDTO = new OrderStatusDTO(status.getCode(), status.getDescription());
                 orderStatusDTOs.add(statusDTO);
             }
         }
         return orderStatusDTOs;
     }
 
-    public String savePurchaseOrder(){
+    public String savePurchaseOrder() {
         this.orderService.savePurchaseOrder(this.purchaseOrder);
         this.purchaseOrder = this.orderService.findPurchaseOrderByID(this.purchaseOrder.getId());
         return null;
@@ -232,8 +237,10 @@ public class OrderMaintainView extends StockMaintainView {
         InputStream fileinputstream = this.getServletContext().getResourceAsStream("/resources/download/ConfirmPI-template.xls");
         POIFSFileSystem poifsfilesystem = new POIFSFileSystem(fileinputstream);
         Workbook wb = new HSSFWorkbook(poifsfilesystem);
-        Sheet sheet = wb.getSheetAt(0);
+
+        POExcelGenerator.generateExcel(wb,purchaseOrder,this.getServletContext());
         writeExcelToResponse(this.getCurrentExternalContext(), wb, "PI.xls");
+        this.getCurrentFacesContext().responseComplete();
         return null;
     }
 
@@ -253,17 +260,17 @@ public class OrderMaintainView extends StockMaintainView {
         this.selectedProd = selectedProd;
     }
 
-    public List<ProductInfo> completeProductInfoList(String code){
+    public List<ProductInfo> completeProductInfoList(String code) {
         List<ProductInfo> result = new ArrayList<ProductInfo>();
-        for(ProductInfo productInfo:this.productList){
-            if(productInfo.getProductCode().toUpperCase().contains(code.toUpperCase())){
+        for (ProductInfo productInfo : this.productList) {
+            if (productInfo.getProductCode().toUpperCase().contains(code.toUpperCase())) {
                 result.add(productInfo);
             }
         }
         return result;
     }
 
-    public void addNewPOItem(SelectEvent e){
+    public void addNewPOItem(SelectEvent e) {
         Object item = e.getObject();
         supportSize = this.selectedProd.getCategory().isSupportSize();
         newOrderItem.setOwner(this.getPurchaseOrder());
@@ -277,7 +284,8 @@ public class OrderMaintainView extends StockMaintainView {
         newOrderItem.setProductInfo(this.getSelectedProd());
         newOrderItem.setUnitPrice(this.getSelectedProd().getPrice());
         this.purchaseOrder.addOrderItemToList(newOrderItem);
-        System.out.println("new Item Prod = "+item);
+        this.addNewOrderItem = true;
+        System.out.println("new Item Prod = " + item);
     }
 
     public boolean isSupportSize() {
@@ -295,32 +303,56 @@ public class OrderMaintainView extends StockMaintainView {
     public void setNewOrderItem(PurchaseOrderItem newOrderItem) {
         this.newOrderItem = newOrderItem;
     }
-    public String addOrderItemToPurchaseOrder(){
+
+    public String addOrderItemToPurchaseOrder() {
         this.purchaseOrder.addOrderItemToList(this.newOrderItem);
         newOrderItem.setDisplaySeq(purchaseOrder.getOrderItemList().size());
         newOrderItem.setPoNumber(this.purchaseOrder.getPurchaseOrderNumber());
         newOrderItem.setPoItemCode(this.purchaseOrder.getPurchaseOrderNumber() + "_" + newOrderItem.getDisplaySeq());
         newOrderItem.setCustomerProductCode(this.getSelectedProd().getCustomerProductCode());
-        newOrderItem.setTotalPrice(newOrderItem.getUnitPrice()*newOrderItem.getTotalAmountBy(newOrderItem.getProductInfo().getCategory().isSupportSize()));
+        newOrderItem.setTotalPrice(newOrderItem.getUnitPrice() * newOrderItem.getTotalAmountBy(newOrderItem.getProductInfo().getCategory().isSupportSize()));
         this.purchaseOrder.caculateTotalAmount();
         this.orderService.savePurchaseOrder(this.purchaseOrder);
         purchaseOrderID = this.purchaseOrder.getId();
         this.purchaseOrder = this.orderService.findPurchaseOrderByID(purchaseOrderID);
         newOrderItem = new PurchaseOrderItem();
         selectedProd = new ProductInfo();
+        this.addNewOrderItem = false;
         return null;
     }
 
     protected void writeExcelToResponse(ExternalContext externalContext, Workbook generatedExcel, String filename) throws IOException {
         externalContext.setResponseContentType("application/vnd.ms-excel");
         externalContext.setResponseHeader("Expires", "0");
-        externalContext.setResponseHeader("Cache-Control","must-revalidate, post-check=0, pre-check=0");
+        //externalContext.setResponseHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
         externalContext.setResponseHeader("Pragma", "public");
-        externalContext.setResponseHeader("Content-disposition", "attachment;filename="+ filename + ".xls");
+        externalContext.setResponseHeader("Content-disposition", "attachment;filename=" + filename + ".xls");
         externalContext.addResponseCookie(Constants.DOWNLOAD_COOKIE, "true", Collections.<String, Object>emptyMap());
 
         OutputStream out = externalContext.getResponseOutputStream();
         generatedExcel.write(out);
         externalContext.responseFlushBuffer();
+
+    }
+
+    public boolean isAddNewOrderItem() {
+        return addNewOrderItem;
+    }
+
+    public void setAddNewOrderItem(boolean addNewOrderItem) {
+        this.addNewOrderItem = addNewOrderItem;
+    }
+
+    public void handleToggle(ToggleEvent event) {
+        if(event.getVisibility()==Visibility.HIDDEN){
+            addNewOrderItem = false;
+        }else{
+            addNewOrderItem = true;
+        }
+
+    }
+
+    public void handleClose(ToggleEvent event) {
+        addNewOrderItem = false;
     }
 }
