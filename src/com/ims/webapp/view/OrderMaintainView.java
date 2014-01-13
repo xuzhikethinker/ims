@@ -12,7 +12,6 @@ import com.ims.webapp.view.dto.ProductInfoDataModel;
 import com.ims.webapp.view.util.POExcelGenerator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
@@ -306,7 +305,7 @@ public class OrderMaintainView extends StockMaintainView {
 
     public String addOrderItemToPurchaseOrder() {
         this.purchaseOrder.addOrderItemToList(this.newOrderItem);
-        newOrderItem.setDisplaySeq(purchaseOrder.getOrderItemList().size());
+        newOrderItem.setDisplaySeq(purchaseOrder.getOrderItemList().size()+1);
         newOrderItem.setPoNumber(this.purchaseOrder.getPurchaseOrderNumber());
         newOrderItem.setPoItemCode(this.purchaseOrder.getPurchaseOrderNumber() + "_" + newOrderItem.getDisplaySeq());
         newOrderItem.setCustomerProductCode(this.getSelectedProd().getCustomerProductCode());

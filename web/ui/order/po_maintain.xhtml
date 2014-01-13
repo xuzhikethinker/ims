@@ -277,10 +277,6 @@
         PO total price <h:outputText id="totalPrice" value="#{orderMaintainView.purchaseOrder.totalPrice}"/>
     </f:facet>
 </p:dataTable>
-<h:commandLink>
-    <p:outputLabel value="Excel1111" />
-    <p:dataExporter type="xls" target="poItemList" fileName="cars" />
-</h:commandLink>
 <br/>
 <p:panel id="newPOItem" header="添加PO产品项" toggleable="true" closable="false" toggleSpeed="500" closeSpeed="500" widgetVar="unitPanel" collapsed="true">
     <p:ajax event="toggle" listener="#{orderMaintainView.handleToggle}" update="newPOItem" />

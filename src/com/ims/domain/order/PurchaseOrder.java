@@ -6,10 +6,7 @@
 package com.ims.domain.order;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Administrator
@@ -34,6 +31,9 @@ public class PurchaseOrder extends OrderGeneralInfo {
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<PurchaseOrderItem> orderItems = new HashSet<PurchaseOrderItem>();
+
+    @Transient
+    private List<PurchaseOrderItem> orderItemList = new ArrayList<PurchaseOrderItem>();
 
     public String getPurchaseOrderNumber() {
         return purchaseOrderNumber;
@@ -88,17 +88,22 @@ public class PurchaseOrder extends OrderGeneralInfo {
         this.totalPrice += itemPrice;
     }
 
-    public List<PurchaseOrderItem> getOrderItemList(){
-        List<PurchaseOrderItem> items = new ArrayList<PurchaseOrderItem>();
-        for(PurchaseOrderItem item:this.getOrderItems()){
-            items.add(item);
+    public List<PurchaseOrderItem> getOrderItemList() {
+        if (this.orderItemList.isEmpty()) {
+            this.orderItemList.addAll(this.orderItems);
+            Collections.sort(this.orderItemList,new Comparator<PurchaseOrderItem>() {
+                @Override
+                public int compare(PurchaseOrderItem o1, PurchaseOrderItem o2) {
+                    return o1.getDisplaySeq()-o2.getDisplaySeq();
+                }
+            });
         }
-        return items;
+        return orderItemList;
     }
 
-    public void caculateTotalAmount(){
+    public void caculateTotalAmount() {
         double total = 0l;
-        for(PurchaseOrderItem item:this.getOrderItemList()){
+        for (PurchaseOrderItem item : this.getOrderItemList()) {
             total += item.getTotalPrice();
         }
         this.setTotalPrice(total);
