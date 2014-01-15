@@ -6,6 +6,7 @@ import com.ims.domain.order.OrderStatus;
 import com.ims.domain.order.PurchaseOrder;
 import com.ims.domain.order.PurchaseOrderItem;
 import com.ims.domain.support.ProductInfo;
+import com.ims.webapp.view.util.NumberUtil;
 import com.ims.webapp.view.util.POInfoFileResolver;
 import com.ims.webapp.view.util.ProductInfoFileResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -93,8 +94,8 @@ public class FileUploadController extends BaseView {
                                 item.setCustomerProductCode(custProdCode);
                                 double unitPrice = item.getUnitPrice() == 0l ? productInfo.getPrice() : item.getUnitPrice();
                                 item.setUnitPrice(unitPrice);
-                                item.setTotalPrice(unitPrice * item.getProductAmount().getTotalAmount());
-                                purchaseOrder.addToTotalPrice(item.getTotalPrice());
+                                item.setTotalPrice(NumberUtil.formatDoubleWith2Decimal(unitPrice * item.getProductAmount().getTotalAmount()));
+                                purchaseOrder.addToTotalPrice(NumberUtil.formatDoubleWith2Decimal(item.getTotalPrice()));
                             } else {
                                 noProduct = true;
                                 noProductList.append("Product No. = " + item.getCompanyProductCode() + "\r\n");

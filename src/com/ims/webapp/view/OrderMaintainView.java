@@ -4,11 +4,15 @@ import com.ims.domain.order.OrderStatus;
 import com.ims.domain.order.ProformaInvoice;
 import com.ims.domain.order.PurchaseOrder;
 import com.ims.domain.order.PurchaseOrderItem;
+import com.ims.domain.stock.ProductStockInfo;
+import com.ims.domain.stock.StockType;
 import com.ims.domain.support.ProductInfo;
 import com.ims.webapp.view.criteria.OrderSearchCriteria;
 import com.ims.webapp.view.criteria.ProdSearchCriteria;
+import com.ims.webapp.view.criteria.ProdStockSearchCriteria;
 import com.ims.webapp.view.dto.OrderStatusDTO;
 import com.ims.webapp.view.dto.ProductInfoDataModel;
+import com.ims.webapp.view.util.NumberUtil;
 import com.ims.webapp.view.util.POExcelGenerator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -28,6 +32,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @ManagedBean(name = "orderMaintainView")
 @ViewScoped
@@ -51,6 +56,7 @@ public class OrderMaintainView extends StockMaintainView {
     private boolean supportSize;
     private PurchaseOrderItem newOrderItem = new PurchaseOrderItem();
     public boolean addNewOrderItem = false;
+    //Map<String, ProductStockInfo> endStockMap;
 
     public OrderMaintainView() {
         System.out.println("OrderMaintainView=" + this);
@@ -65,7 +71,18 @@ public class OrderMaintainView extends StockMaintainView {
     public void loadPO() {
         this.purchaseOrder = this.orderService.findPurchaseOrderByID(purchaseOrderID);
         this.productList = this.supportingDataService.getProductInfoList(new ProdSearchCriteria());
+        this.buildOrderItemStockInfo();
         System.out.println("id=" + this.purchaseOrderID);
+    }
+
+    private void buildOrderItemStockInfo(){
+        Map<String, ProductStockInfo> endStockMap = this.productStockInfoService.getProductStockMapWithProdCodeKey(new ProdStockSearchCriteria(StockType.Finished.getCode()));
+        for(PurchaseOrderItem item:this.purchaseOrder.getOrderItemList()){
+            ProductStockInfo stockInfo = endStockMap.get(item.getCompanyProductCode());
+            if(stockInfo!=null){
+                item.setProductStockAmount(stockInfo.getProductAmount());
+            }
+        }
     }
 
     public String gotoModifyPO() {
@@ -76,6 +93,7 @@ public class OrderMaintainView extends StockMaintainView {
     public void updateOrderItem(RowEditEvent event) {
         PurchaseOrderItem orderItem = (PurchaseOrderItem) event.getObject();
         this.purchaseOrder = this.orderService.savePurchaseOrderItem(orderItem);
+        this.buildOrderItemStockInfo();
         System.out.println("total=" + this.purchaseOrder.getTotalPrice());
 //        selectedProductInfo = (ProductInfo) event.getObject();
 //        FacesMessage msg = new FacesMessage("更新产品信息", "产品信息成功更新");
@@ -237,7 +255,7 @@ public class OrderMaintainView extends StockMaintainView {
         POIFSFileSystem poifsfilesystem = new POIFSFileSystem(fileinputstream);
         Workbook wb = new HSSFWorkbook(poifsfilesystem);
 
-        POExcelGenerator.generateExcel(wb,purchaseOrder,this.getServletContext());
+        POExcelGenerator.generateExcel(wb, purchaseOrder, this.getServletContext());
         writeExcelToResponse(this.getCurrentExternalContext(), wb, "PI.xls");
         this.getCurrentFacesContext().responseComplete();
         return null;
@@ -276,7 +294,7 @@ public class OrderMaintainView extends StockMaintainView {
         newOrderItem.setTotalPrice(0l);
         newOrderItem.setPoNumber(this.purchaseOrder.getPurchaseOrderNumber());
         newOrderItem.setCompanyProductCode(this.selectedProd.getProductCode());
-        newOrderItem.setDisplaySeq(this.purchaseOrderList.size() + 1);
+        newOrderItem.setDisplaySeq(this.purchaseOrder.getNextDisplaySeq());
         newOrderItem.setUnitPrice(1l);
         newOrderItem.setPoItemCode("newItemCode");
         newOrderItem.setCustomerProductCode("CustomerProdCode");
@@ -305,17 +323,18 @@ public class OrderMaintainView extends StockMaintainView {
 
     public String addOrderItemToPurchaseOrder() {
         this.purchaseOrder.addOrderItemToList(this.newOrderItem);
-        newOrderItem.setDisplaySeq(purchaseOrder.getOrderItemList().size()+1);
+        newOrderItem.setDisplaySeq(purchaseOrder.getNextDisplaySeq());
         newOrderItem.setPoNumber(this.purchaseOrder.getPurchaseOrderNumber());
         newOrderItem.setPoItemCode(this.purchaseOrder.getPurchaseOrderNumber() + "_" + newOrderItem.getDisplaySeq());
         newOrderItem.setCustomerProductCode(this.getSelectedProd().getCustomerProductCode());
-        newOrderItem.setTotalPrice(newOrderItem.getUnitPrice() * newOrderItem.getTotalAmountBy(newOrderItem.getProductInfo().getCategory().isSupportSize()));
+        newOrderItem.setTotalPrice(NumberUtil.formatDoubleWith2Decimal(newOrderItem.getUnitPrice() * newOrderItem.getTotalAmountBy(newOrderItem.getProductInfo().getCategory().isSupportSize())));
         this.purchaseOrder.caculateTotalAmount();
         this.orderService.savePurchaseOrder(this.purchaseOrder);
         purchaseOrderID = this.purchaseOrder.getId();
         this.purchaseOrder = this.orderService.findPurchaseOrderByID(purchaseOrderID);
         newOrderItem = new PurchaseOrderItem();
         selectedProd = new ProductInfo();
+        this.supportSize = false;
         this.addNewOrderItem = false;
         return null;
     }
@@ -343,9 +362,9 @@ public class OrderMaintainView extends StockMaintainView {
     }
 
     public void handleToggle(ToggleEvent event) {
-        if(event.getVisibility()==Visibility.HIDDEN){
+        if (event.getVisibility() == Visibility.HIDDEN) {
             addNewOrderItem = false;
-        }else{
+        } else {
             addNewOrderItem = true;
         }
 

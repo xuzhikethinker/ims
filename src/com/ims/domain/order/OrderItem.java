@@ -32,6 +32,9 @@ public abstract class OrderItem extends PersistenceDomain {
     @Embedded
     private ProductAmount productAmount = new ProductAmount();
 
+    @Transient
+    private ProductAmount productStockAmount = new ProductAmount();
+
     @Column(name = "UNIT_PRICE")
     private double unitPrice;
 
@@ -105,5 +108,13 @@ public abstract class OrderItem extends PersistenceDomain {
         }else{
             return this.productAmount.getTotalAmount();
         }
+    }
+
+    public ProductAmount getProductStockAmount() {
+        return productStockAmount;
+    }
+
+    public void setProductStockAmount(ProductAmount productStockAmount) {
+        this.productStockAmount = productStockAmount;
     }
 }

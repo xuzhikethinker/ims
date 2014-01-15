@@ -14,6 +14,7 @@ import com.ims.repository.ProformaInvoiceRepository;
 import com.ims.repository.PurchaseOrderItemRepository;
 import com.ims.repository.PurchaseOrderRepository;
 import com.ims.webapp.view.criteria.OrderSearchCriteria;
+import com.ims.webapp.view.util.NumberUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -98,7 +99,7 @@ public class OrderService {
     }
 
     public PurchaseOrder savePurchaseOrderItem(PurchaseOrderItem item){
-        item.setTotalPrice(item.getProductAmount().getTotalAmount()*item.getUnitPrice());
+        item.setTotalPrice(NumberUtil.formatDoubleWith2Decimal(item.getProductAmount().getTotalAmount()*item.getUnitPrice()));
         PurchaseOrder purchaseOrder = item.getOwner();
 //        PurchaseOrderItem updatedItem = this.purchaseOrderItemRepository.saveAndFlush(item);
 //        PurchaseOrder purchaseOrder = updatedItem.getOwner();
@@ -107,8 +108,9 @@ public class OrderService {
         for(PurchaseOrderItem dbItem:items){
             total += dbItem.getTotalPrice();
         }
-        purchaseOrder.setTotalPrice(total);
+        purchaseOrder.setTotalPrice(NumberUtil.formatDoubleWith2Decimal(total));
         purchaseOrder = this.purchaseOrderRepository.saveAndFlush(purchaseOrder);
-        return purchaseOrder;
+
+        return this.findPurchaseOrderByID(purchaseOrder.getId());
     }
 }

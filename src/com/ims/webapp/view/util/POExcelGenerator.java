@@ -2,6 +2,7 @@ package com.ims.webapp.view.util;
 
 import com.ims.domain.order.PurchaseOrder;
 import com.ims.domain.order.PurchaseOrderItem;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.IOUtils;
 
@@ -78,8 +79,16 @@ public class POExcelGenerator {
             Drawing drawing = sheet.createDrawingPatriarch();
             List<PurchaseOrderItem> items = purchaseOrder.getOrderItemList();
             PurchaseOrderItem item = null;
+            CellStyle cellStyle = wb.createCellStyle();
+            cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框
+            cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框
+            cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框
+            cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框
             //add a picture shape
             for (int i = 0; i < itemRow; i++) {
+                row = sheet.createRow(i + 15);
+                row.setHeight((short) 1050);
+                row.createCell(0).setCellStyle(cellStyle);
                 ClientAnchor anchor = helper.createClientAnchor();
                 //set top-left corner of the picture,
                 //subsequent call of Picture#resize() will operate relative to it
@@ -90,47 +99,91 @@ public class POExcelGenerator {
                 //auto-size picture relative to its top-left corner
                 pict.resize();
 
+                Cell cell = null;
                 item = items.get(i);
-                row = sheet.getRow(i + 15);
-                row.getCell(1).setCellValue(purchaseOrder.getPurchaseOrderNumber());
-                row.getCell(2).setCellValue(item.getProductInfo().getCustomerProductCode());
-                row.getCell(3).setCellValue(item.getCompanyProductCode());
-                row.getCell(4).setCellValue(item.getProductInfo().getDescription());
+                setCellStringValue(row.createCell(1), purchaseOrder.getPurchaseOrderNumber(), cellStyle);
+                setCellStringValue(row.createCell(2),item.getProductInfo().getCustomerProductCode(),cellStyle);
+                setCellStringValue(row.createCell(3), item.getCompanyProductCode(), cellStyle);
+                setCellStringValue(row.createCell(4),item.getProductInfo().getDescription(),cellStyle);
 
                 if (item.getProductInfo().getCategory().isSupportSize()) {
+                    cell = getCell(row,6,cellStyle);
                     if (item.getProductAmount().getSize4Amount() > 0) {
-                        row.getCell(6).setCellValue(item.getProductAmount().getSize4Amount());
+                        cell.setCellValue(item.getProductAmount().getSize4Amount());
                     }
+
+                    cell = getCell(row,7,cellStyle);
                     if (item.getProductAmount().getSize5Amount() > 0) {
-                        row.getCell(7).setCellValue(item.getProductAmount().getSize5Amount());
+                        cell.setCellValue(item.getProductAmount().getSize5Amount());
                     }
+
+                    cell = getCell(row,8,cellStyle);
                     if (item.getProductAmount().getSize6Amount() > 0) {
-                        row.getCell(8).setCellValue(item.getProductAmount().getSize6Amount());
+                        cell.setCellValue(item.getProductAmount().getSize6Amount());
                     }
+
+                    cell = getCell(row,9,cellStyle);
                     if (item.getProductAmount().getSize7Amount() > 0) {
-                        row.getCell(9).setCellValue(item.getProductAmount().getSize7Amount());
+                        cell.setCellValue(item.getProductAmount().getSize7Amount());
                     }
+
+                    cell = getCell(row,10,cellStyle);
                     if (item.getProductAmount().getSize8Amount() > 0) {
-                        row.getCell(10).setCellValue(item.getProductAmount().getSize8Amount());
+                        cell.setCellValue(item.getProductAmount().getSize8Amount());
                     }
+
+                    cell = getCell(row,11,cellStyle);
                     if (item.getProductAmount().getSize9Amount() > 0) {
-                        row.getCell(11).setCellValue(item.getProductAmount().getSize9Amount());
+                        cell.setCellValue(item.getProductAmount().getSize9Amount());
                     }
+
+                    cell = getCell(row,12,cellStyle);
                     if (item.getProductAmount().getSize10Amount() > 0) {
-                        row.getCell(12).setCellValue(item.getProductAmount().getSize10Amount());
+                        cell.setCellValue(item.getProductAmount().getSize10Amount());
                     }
                 } else {
-
+                    getCell(row,6,cellStyle);
+                    getCell(row,7,cellStyle);
+                    getCell(row,8,cellStyle);
+                    getCell(row,9,cellStyle);
+                    getCell(row,10,cellStyle);
+                    getCell(row,11,cellStyle);
+                    getCell(row,12,cellStyle);
                 }
-                row.getCell(13).setCellValue(item.getProductAmount().getTotalAmount());
-                row.getCell(14).setCellValue(item.getProductInfo().getCategory().getUnit());
-                row.getCell(15).setCellValue(item.getUnitPrice());
-                row.getCell(16).setCellValue(item.getTotalPrice());
+
+                cell = getCell(row,13,cellStyle);
+                cell.setCellValue("$"+item.getProductAmount().getTotalAmount());
+                cell = getCell(row,14,cellStyle);
+                cell.setCellValue(item.getProductInfo().getCategory().getUnit());
+                cell = getCell(row,15,cellStyle);
+                cell.setCellValue("$"+item.getUnitPrice());
+                cell = getCell(row,16,cellStyle);
+                cell.setCellValue("$"+item.getTotalPrice());
 
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static Cell getCell(Row row, int col, CellStyle cellStyle){
+        Cell cell = row.createCell(col);
+        cell.setCellStyle(cellStyle);
+        return cell;
+    }
+    private static void setCellStringValue(Cell cell,String value,CellStyle cellStyle){
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(value);
+    }
+
+    private static void setCellIntValue(Cell cell,int value,CellStyle cellStyle){
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(value);
+    }
+
+    private static void setCellDoubleValue(Cell cell,double value,CellStyle cellStyle){
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(value);
     }
 }

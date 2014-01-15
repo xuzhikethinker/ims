@@ -5,6 +5,8 @@
  */
 package com.ims.domain.order;
 
+import com.ims.webapp.view.util.NumberUtil;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -91,10 +93,10 @@ public class PurchaseOrder extends OrderGeneralInfo {
     public List<PurchaseOrderItem> getOrderItemList() {
         if (this.orderItemList.isEmpty()) {
             this.orderItemList.addAll(this.orderItems);
-            Collections.sort(this.orderItemList,new Comparator<PurchaseOrderItem>() {
+            Collections.sort(this.orderItemList, new Comparator<PurchaseOrderItem>() {
                 @Override
                 public int compare(PurchaseOrderItem o1, PurchaseOrderItem o2) {
-                    return o1.getDisplaySeq()-o2.getDisplaySeq();
+                    return o1.getDisplaySeq() - o2.getDisplaySeq();
                 }
             });
         }
@@ -106,6 +108,14 @@ public class PurchaseOrder extends OrderGeneralInfo {
         for (PurchaseOrderItem item : this.getOrderItemList()) {
             total += item.getTotalPrice();
         }
-        this.setTotalPrice(total);
+        this.setTotalPrice(NumberUtil.formatDoubleWith2Decimal(total));
+    }
+
+    public int getNextDisplaySeq() {
+        int seq = 0;
+        for (PurchaseOrderItem item : this.getOrderItemList()) {
+            seq = seq < item.getDisplaySeq() ? item.getDisplaySeq() : seq;
+        }
+        return seq + 1;
     }
 }
