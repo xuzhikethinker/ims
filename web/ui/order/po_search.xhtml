@@ -64,12 +64,7 @@
                 </p:column>
 
                 <p:column styleClass="table_header">
-                    <p:commandLink style="margin-right:20px;" ajax="false" action="#{orderMaintainView.gotoModifyPO}">
-                        <h:outputText value="更新"/>
-                        <f:setPropertyActionListener value="#{po}" target="#{orderMaintainView.purchaseOrder}"/>
-                        <f:setPropertyActionListener value="#{po.id}" target="#{orderMaintainView.purchaseOrderID}"/>
-                    </p:commandLink>
-                    <h:link outcome="po_maintain.xhtml?purchaseOrderID=#{po.id}"><span>更新2</span></h:link>
+                    <h:link outcome="po_maintain.xhtml?purchaseOrderID=#{po.id}"><span>更新</span></h:link>
                 </p:column>
             </p:dataTable>
         </p:outputPanel>

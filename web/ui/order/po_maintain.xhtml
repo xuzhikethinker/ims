@@ -78,6 +78,8 @@
                 <f:selectItems value="#{orderMaintainView.purchaseOrderStatus}" var="status"
                                itemLabel="#{status.description}" itemValue="#{status.code}"/>
             </p:selectOneMenu>
+            <p:spacer width="10" height="10" />
+            <p:outputLabel value=" 只有草稿状态才可以添加和修改产品项" style="color: red"></p:outputLabel>
         </h:panelGrid>
         <h:panelGrid columns="2">
             <h:outputLabel for="poNum" value="Customer PO No.:"/>
@@ -132,7 +134,7 @@
     <c:set var="supportSize" value="#{orderItem.productInfo.category.supportSize}"/>
     <!-- 产品代码 -->
     <p:column styleClass="table_header">
-        <p:outputLabel id="code" value="#{orderItem.companyProductCode}=#{orderItem.version}"/>
+        <p:outputLabel id="code" value="#{orderItem.companyProductCode}"/>
         <p:tooltip for="code" value="#{orderItem.productInfo.categoryCode}" showEffect="fade" hideEffect="fade"/>
     </p:column>
 
@@ -299,13 +301,14 @@
         <p:ajax event="toggle" listener="#{orderMaintainView.handleToggle}" update="newPOItem" />
         <p:ajax event="close" listener="#{orderMaintainView.handleClose}" update="newPOItem"/>
         <p:growl id="amountError" showDetail="false"/>
-        <h:panelGrid columns="2" id="editUnitSection">
+        <h:panelGrid columns="3" id="editUnitSection">
             <h:outputLabel value="产品编号 : *" for="item"></h:outputLabel>
             <p:autoComplete value="#{orderMaintainView.selectedProd}" id="item" completeMethod="#{orderMaintainView.completeProductInfoList}"
                             var="p" itemLabel="#{p.productCode}" itemValue="#{p}" converter="#{productInfoConverter}"
                             forceSelection="true"  required="#{orderMaintainView.addNewOrderItem}" requiredMessage="请选择产品编号" >
                 <p:ajax event="itemSelect" listener="#{orderMaintainView.addNewPOItem}" update="itemAmount"/>
             </p:autoComplete>
+            <p:outputLabel value="输入产品编号前面两位，会自动列出所有产品项" style="color: red"/>
         </h:panelGrid>
         <p:outputPanel deferred="true" id="itemAmount">
 

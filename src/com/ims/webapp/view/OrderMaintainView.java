@@ -231,6 +231,17 @@ public class OrderMaintainView extends StockMaintainView {
         return orderStatusDTOs;
     }
 
+    public List<OrderStatusDTO> getStatusToCreatePI(){
+        List<OrderStatusDTO> orderStatusDTOs = new ArrayList<OrderStatusDTO>();
+        for (OrderStatus status : OrderStatus.values()) {
+            if (status.isAllowCreatePI()) {
+                OrderStatusDTO statusDTO = new OrderStatusDTO(status.getCode(), status.getDescription());
+                orderStatusDTOs.add(statusDTO);
+            }
+        }
+        return orderStatusDTOs;
+    }
+
     public List<OrderStatusDTO> getProformaInvoiceStatus() {
         List<OrderStatusDTO> orderStatusDTOs = new ArrayList<OrderStatusDTO>();
         for (OrderStatus status : OrderStatus.values()) {

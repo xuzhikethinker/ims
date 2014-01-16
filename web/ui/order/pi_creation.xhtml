@@ -1,0 +1,78 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="siteTitle">库存管理系统-PI管理</ui:define>
+    <ui:define name="breadCrumbText">创建PI</ui:define>
+
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="menuCode" value="#{fileUploadController.menuCode}"/>
+            <f:viewAction action="#{orderMaintainView.loadData}" onPostback="false"/>
+        </f:metadata>
+    </ui:define>
+
+    <ui:define name="mainContentContainer">
+
+        <p:panel header="PI只能从'客户已确认'状态的PO中创建" id="createPI">
+            <h:panelGrid id="searchPOCriteria" columns="10" style="margin-left: 5px;">
+                <h:outputLabel for="prodType" value="PO状态:"/>
+                <p:selectOneMenu id="prodType" value="#{orderMaintainView.orderSearchCriteria.purchaseOrderStatus}"
+                                 style="width: 200px;">
+                    <f:selectItem itemLabel="所有状态" itemValue=""/>
+                    <f:selectItems value="#{orderMaintainView.statusToCreatePI}" var="status"
+                                   itemLabel="#{status.description}" itemValue="#{status.code}"/>
+                </p:selectOneMenu>
+
+                <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+                <h:outputLabel for="poNum" value="PO No.: "/>
+                <p:inputText id="poNum" value="#{orderMaintainView.orderSearchCriteria.purchaseOrderNum}"
+                             style="width: 120px;"/>
+
+                <h:outputLabel value=" &#160;&#160;&#160;"></h:outputLabel>
+                <p:commandButton id="btn_searchProdInfo" value="查找" process="searchPOCriteria" update=":form"
+                                 action="#{orderMaintainView.searchPurchaseOrder}">
+                </p:commandButton>
+            </h:panelGrid>
+            <br/>
+            <p:outputPanel id="POPanel" style="margin-left: 5px;">
+                <p:dataTable id="posTable" value="#{orderMaintainView.purchaseOrderList}" var="po"
+                             paginator="true" rows="10"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} ">
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column headerText="PO No." styleClass="table_header" style="width:20%"/>
+                            <p:column headerText="PI No." styleClass="table_header" style="width:20%"/>
+                            <p:column headerText="PO状态" styleClass="table_header" style="width:20%"/>
+                            <p:column headerText="PO总价" styleClass="table_header" style="width:20%"/>
+                            <p:column headerText="操作" styleClass="table_header" style="width:20%"/>
+                        </p:row>
+                    </p:columnGroup>
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{po.purchaseOrderNumber}"/>
+                    </p:column>
+
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{po.piNumber}"/>
+                    </p:column>
+
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{po.statusDisplayString}"/>
+                    </p:column>
+
+                    <p:column styleClass="table_header">
+                        <h:outputText value="#{po.totalPrice}"/>
+                    </p:column>
+
+                    <p:column styleClass="table_header">
+                        <h:link outcome="pi_maintain.xhtml?purchaseOrderID=#{po.id}"><span>创建PI</span></h:link>
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+
+        </p:panel>
+    </ui:define>
+</ui:composition>
