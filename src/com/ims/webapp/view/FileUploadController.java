@@ -171,7 +171,7 @@ public class FileUploadController extends BaseView {
                 File targetFolder = new File(this.getInitParamValueByKey("UPLOAD_IMAGE_PATH"));
                 UploadedFile file = event.getFile();
                 prodCategoryList = this.supportingDataService.loadProdCategoryList(true);
-                if (fileType.equals("prodInfoList")) {
+                if (fileType!=null && fileType.equals("prodInfoList")) {
 //                    ProductInfoFileResolver.resolveProductInfoListFile(file.getInputstream(), file.getFileName(), prodCategoryList);
                     this.supportingDataService.updateCategoryList(prodCategoryList);
                     this.productList = this.supportingDataService.getProductInfoList(null);

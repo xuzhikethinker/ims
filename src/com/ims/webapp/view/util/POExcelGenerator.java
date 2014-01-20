@@ -86,8 +86,10 @@ public class POExcelGenerator {
             cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框
             //add a picture shape
             for (int i = 0; i < itemRow; i++) {
+                item = items.get(i);
+                pictureIdx = getPictureIndex(wb,item.getProductInfo().getPictureName(),servletContext);
                 row = sheet.createRow(i + 15);
-                row.setHeight((short) 1050);
+                row.setHeight((short) 1750);
                 row.createCell(0).setCellStyle(cellStyle);
                 ClientAnchor anchor = helper.createClientAnchor();
                 //set top-left corner of the picture,
@@ -100,7 +102,7 @@ public class POExcelGenerator {
                 pict.resize();
 
                 Cell cell = null;
-                item = items.get(i);
+
                 setCellStringValue(row.createCell(1), purchaseOrder.getPurchaseOrderNumber(), cellStyle);
                 setCellStringValue(row.createCell(2),item.getProductInfo().getCustomerProductCode(),cellStyle);
                 setCellStringValue(row.createCell(3), item.getCompanyProductCode(), cellStyle);
@@ -167,6 +169,19 @@ public class POExcelGenerator {
         }
     }
 
+    private static int getPictureIndex(Workbook wb,String picName, ServletContext servletContext){
+        InputStream stream = servletContext.getResourceAsStream("/resources/upload/"+picName);
+        int pictureIdx = 0;
+        try {
+            byte[] bytes = IOUtils.toByteArray(stream);
+            pictureIdx = wb.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
+
+            stream.close();
+        } catch (IOException e) {
+            return 0;
+        }
+        return pictureIdx;
+    }
     private static Cell getCell(Row row, int col, CellStyle cellStyle){
         Cell cell = row.createCell(col);
         cell.setCellStyle(cellStyle);

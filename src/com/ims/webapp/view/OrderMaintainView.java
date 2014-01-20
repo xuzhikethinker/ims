@@ -267,7 +267,7 @@ public class OrderMaintainView extends StockMaintainView {
         Workbook wb = new HSSFWorkbook(poifsfilesystem);
 
         POExcelGenerator.generateExcel(wb, purchaseOrder, this.getServletContext());
-        writeExcelToResponse(this.getCurrentExternalContext(), wb, "PI.xls");
+        writeExcelToResponse(this.getCurrentExternalContext(), wb, "PurchaseOrder");
         this.getCurrentFacesContext().responseComplete();
         return null;
     }
